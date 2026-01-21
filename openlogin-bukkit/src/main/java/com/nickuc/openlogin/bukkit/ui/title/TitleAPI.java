@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.ui.title;
+package com.sobble.pleasejustlogin.bukkit.ui.title;
 
-import com.nickuc.openlogin.common.model.Title;
+import com.sobble.pleasejustlogin.common.model.Title;
 import org.bukkit.entity.Player;
 
 public interface TitleAPI {

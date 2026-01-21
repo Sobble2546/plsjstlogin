@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.ui.title;
+package com.sobble.pleasejustlogin.bukkit.ui.title;
 
-import com.nickuc.openlogin.bukkit.ui.title.impl.PacketTitleImpl;
-import com.nickuc.openlogin.bukkit.ui.title.impl.SpigotTitleImpl;
-import com.nickuc.openlogin.common.model.Title;
+import com.sobble.pleasejustlogin.bukkit.ui.title.impl.PacketTitleImpl;
+import com.sobble.pleasejustlogin.bukkit.ui.title.impl.SpigotTitleImpl;
+import com.sobble.pleasejustlogin.common.model.Title;
 import org.bukkit.entity.Player;
 
 public class TitleAPIHolder {

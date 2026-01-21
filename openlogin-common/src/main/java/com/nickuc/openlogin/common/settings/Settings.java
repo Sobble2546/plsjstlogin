@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common.settings;
+package com.sobble.pleasejustlogin.common.settings;
 
 import lombok.Getter;
 import lombok.NonNull;

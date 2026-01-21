@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common.security.filter;
+package com.sobble.pleasejustlogin.common.security.filter;
 
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common.http;
+package com.sobble.pleasejustlogin.common.http;
 
 import lombok.*;
 import lombok.experimental.Accessors;

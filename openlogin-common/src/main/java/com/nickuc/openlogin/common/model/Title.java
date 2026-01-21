@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common.model;
+package com.sobble.pleasejustlogin.common.model;
 
-import com.nickuc.openlogin.common.util.ChatColor;
+import com.sobble.pleasejustlogin.common.util.ChatColor;
 
 public class Title {
 

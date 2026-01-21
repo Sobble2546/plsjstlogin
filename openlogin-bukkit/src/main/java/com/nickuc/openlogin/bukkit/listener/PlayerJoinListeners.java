@@ -22,15 +22,13 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.listener;
+package com.sobble.pleasejustlogin.bukkit.listener;
 
-import com.nickuc.openlogin.bukkit.OpenLoginBukkit;
-import com.nickuc.openlogin.bukkit.task.LoginQueue;
-import com.nickuc.openlogin.bukkit.ui.title.TitleAPI;
-import com.nickuc.openlogin.bukkit.util.TextComponentMessage;
-import com.nickuc.openlogin.common.model.Title;
-import com.nickuc.openlogin.common.settings.Messages;
-import com.nickuc.openlogin.common.util.ClassUtils;
+import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
+import com.sobble.pleasejustlogin.bukkit.task.LoginQueue;
+import com.sobble.pleasejustlogin.bukkit.ui.title.TitleAPI;
+import com.sobble.pleasejustlogin.common.model.Title;
+import com.sobble.pleasejustlogin.common.settings.Messages;
 import lombok.AllArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -48,6 +46,10 @@ public class PlayerJoinListeners implements Listener {
         Player player = e.getPlayer();
         String name = player.getName();
 
+        plugin.rememberLoginLocation(player);
+        plugin.markLoginTeleport(name);
+        plugin.getFoliaLib().runAtEntity(player, task -> player.teleport(plugin.getLoginSpawnLocation(player)));
+
         if (plugin.isNewUser()) {
             plugin.getFoliaLib().runLater(() -> {
                 if (!player.isOnline()) {
@@ -57,22 +59,15 @@ public class PlayerJoinListeners implements Listener {
                 player.sendMessage("");
                 player.sendMessage(" §eHello, " + player.getName() + "!");
                 player.sendMessage("");
-                player.sendMessage("  §7Before we start, please select");
-                player.sendMessage("  §7your favorite login plugin.");
+                player.sendMessage("  §7Welcome to §fPLEASE JUST LOGIN§7.");
+                player.sendMessage("  §7Fork of OpenLogin with more features!");
                 player.sendMessage("");
-                if (ClassUtils.exists("net.md_5.bungee.api.chat.TextComponent")) {
-                    TextComponentMessage.sendPluginChoice(player);
-                } else {
-                    player.sendMessage("      §enLogin              §eOpeNLogin");
-                    player.sendMessage("  §6(proprietary)      §b(open source)");
-                    player.sendMessage("");
-                    player.sendMessage(" §7To use nLogin, type: §f'/openlogin nlogin'");
-                    player.sendMessage(" §7To use OpeNLogin, type: §f'/openlogin setup'");
-                }
+                player.sendMessage("  §7Notice: Generative AI was used to build");
+                player.sendMessage("  §7the new features in this fork.");
                 player.sendMessage("");
 
                 TitleAPI.getApi().send(player,
-                        new Title("", "§ePlease answer the question sent in the chat.", 0, 9999, 10));
+                        new Title("", "§ePlease log in to continue.", 0, 9999, 10));
             }, 30L);
 
             e.setJoinMessage("");

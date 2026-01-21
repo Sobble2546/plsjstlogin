@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common.security.filter;
+package com.sobble.pleasejustlogin.common.security.filter;
 
-import com.nickuc.openlogin.common.util.ClassUtils;
+import com.sobble.pleasejustlogin.common.util.ClassUtils;
 import lombok.NonNull;
 
 import java.util.HashSet;

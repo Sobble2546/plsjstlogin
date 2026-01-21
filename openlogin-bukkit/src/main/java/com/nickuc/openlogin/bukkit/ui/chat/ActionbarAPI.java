@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.ui.chat;
+package com.sobble.pleasejustlogin.bukkit.ui.chat;
 
 import org.bukkit.entity.Player;
 

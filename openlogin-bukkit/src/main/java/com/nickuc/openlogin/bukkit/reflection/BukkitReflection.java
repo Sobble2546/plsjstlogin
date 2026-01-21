@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.reflection;
+package com.sobble.pleasejustlogin.bukkit.reflection;
 
-import com.nickuc.openlogin.bukkit.enums.BukkitVersion;
+import com.sobble.pleasejustlogin.bukkit.enums.BukkitVersion;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

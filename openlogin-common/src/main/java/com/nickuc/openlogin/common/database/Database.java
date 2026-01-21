@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common.database;
+package com.sobble.pleasejustlogin.common.database;
 
 import java.io.Closeable;
 import java.sql.Connection;

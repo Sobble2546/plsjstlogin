@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.nickuc.openlogin.common.security.hashing;
+package com.sobble.pleasejustlogin.common.security.hashing;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;

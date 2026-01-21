@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common;
+package com.sobble.pleasejustlogin.common;
 
-import com.nickuc.openlogin.common.api.OpenLoginAPI;
+import com.sobble.pleasejustlogin.common.api.OpenLoginAPI;
 import lombok.NonNull;
 
 public class OpenLogin {

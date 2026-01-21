@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common.settings;
+package com.sobble.pleasejustlogin.common.settings;
 
-import com.nickuc.openlogin.common.model.Title;
-import com.nickuc.openlogin.common.util.ChatColor;
+import com.sobble.pleasejustlogin.common.model.Title;
+import com.sobble.pleasejustlogin.common.util.ChatColor;
 import lombok.Getter;
 import lombok.NonNull;
 

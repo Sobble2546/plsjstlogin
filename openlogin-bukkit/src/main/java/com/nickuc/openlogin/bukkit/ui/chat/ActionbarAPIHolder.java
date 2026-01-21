@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.ui.chat;
+package com.sobble.pleasejustlogin.bukkit.ui.chat;
 
-import com.nickuc.openlogin.bukkit.ui.chat.impl.PacketActionbarImpl;
-import com.nickuc.openlogin.bukkit.ui.chat.impl.SpigotActionbarImpl;
+import com.sobble.pleasejustlogin.bukkit.ui.chat.impl.PacketActionbarImpl;
+import com.sobble.pleasejustlogin.bukkit.ui.chat.impl.SpigotActionbarImpl;
 
 public class ActionbarAPIHolder {
 

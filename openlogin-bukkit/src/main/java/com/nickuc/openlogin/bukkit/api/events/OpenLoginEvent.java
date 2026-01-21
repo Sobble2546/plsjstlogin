@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.api.events;
+package com.sobble.pleasejustlogin.bukkit.api.events;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;

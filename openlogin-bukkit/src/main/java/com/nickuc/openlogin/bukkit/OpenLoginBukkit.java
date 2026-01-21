@@ -22,28 +22,29 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit;
+package com.sobble.pleasejustlogin.bukkit;
 
-import com.nickuc.openlogin.bukkit.api.OLBukkitAPI;
-import com.nickuc.openlogin.bukkit.command.CommandManagement;
-import com.nickuc.openlogin.bukkit.listener.PlayerAuthenticateListener;
-import com.nickuc.openlogin.bukkit.listener.PlayerGeneralListeners;
-import com.nickuc.openlogin.bukkit.listener.PlayerJoinListeners;
-import com.nickuc.openlogin.bukkit.listener.PlayerKickListeners;
-import com.nickuc.openlogin.bukkit.task.LoginQueue;
-import com.nickuc.openlogin.common.OpenLogin;
-import com.nickuc.openlogin.common.api.OpenLoginAPI;
-import com.nickuc.openlogin.common.database.Database;
-import com.nickuc.openlogin.common.database.PluginSettings;
-import com.nickuc.openlogin.common.database.SQLite;
-import com.nickuc.openlogin.common.http.HttpClient;
-import com.nickuc.openlogin.common.manager.AccountManagement;
-import com.nickuc.openlogin.common.manager.LoginManagement;
-import com.nickuc.openlogin.common.model.Title;
-import com.nickuc.openlogin.common.security.filter.LoggerFilterManager;
-import com.nickuc.openlogin.common.settings.Messages;
-import com.nickuc.openlogin.common.settings.Settings;
-import com.nickuc.openlogin.common.util.FileUtils;
+import com.sobble.pleasejustlogin.bukkit.api.OLBukkitAPI;
+import com.sobble.pleasejustlogin.bukkit.command.CommandManagement;
+import com.sobble.pleasejustlogin.bukkit.listener.PlayerAuthenticateListener;
+import com.sobble.pleasejustlogin.bukkit.listener.PlayerGeneralListeners;
+import com.sobble.pleasejustlogin.bukkit.listener.PlayerJoinListeners;
+import com.sobble.pleasejustlogin.bukkit.listener.PlayerKickListeners;
+import com.sobble.pleasejustlogin.bukkit.protocol.ProtocolLibInventoryHider;
+import com.sobble.pleasejustlogin.bukkit.task.LoginQueue;
+import com.sobble.pleasejustlogin.common.OpenLogin;
+import com.sobble.pleasejustlogin.common.api.OpenLoginAPI;
+import com.sobble.pleasejustlogin.common.database.Database;
+import com.sobble.pleasejustlogin.common.database.PluginSettings;
+import com.sobble.pleasejustlogin.common.database.SQLite;
+import com.sobble.pleasejustlogin.common.http.HttpClient;
+import com.sobble.pleasejustlogin.common.manager.AccountManagement;
+import com.sobble.pleasejustlogin.common.manager.LoginManagement;
+import com.sobble.pleasejustlogin.common.model.Title;
+import com.sobble.pleasejustlogin.common.security.filter.LoggerFilterManager;
+import com.sobble.pleasejustlogin.common.settings.Messages;
+import com.sobble.pleasejustlogin.common.settings.Settings;
+import com.sobble.pleasejustlogin.common.util.FileUtils;
 import com.tcoded.folialib.FoliaLib;
 import com.tcoded.folialib.impl.ServerImplementation;
 import lombok.Getter;
@@ -51,8 +52,11 @@ import lombok.Setter;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bstats.charts.SingleLineChart;
+import org.bukkit.Location;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -60,6 +64,9 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class OpenLoginBukkit extends JavaPlugin {
@@ -71,12 +78,125 @@ public class OpenLoginBukkit extends JavaPlugin {
 
     private Database database;
     private PluginSettings pluginSettings;
+    private File loginLocationsFile;
+    private YamlConfiguration loginLocationsConfig;
 
     private String latestVersion;
     private boolean updateAvailable;
     @Setter
     private boolean newUser;
     private int registeredUsers;
+    private final Map<String, Location> loginLocations = new ConcurrentHashMap<>();
+    private final Set<String> loginTeleports = ConcurrentHashMap.newKeySet();
+
+    public void rememberLoginLocation(Player player) {
+        String name = player.getName().toLowerCase();
+        if (loginLocations.containsKey(name)) {
+            return;
+        }
+        Location location = player.getLocation().clone();
+        loginLocations.put(name, location);
+        persistLoginLocation(name, location);
+    }
+
+    public Location popLoginLocation(String name) {
+        String key = name.toLowerCase();
+        Location location = loginLocations.remove(key);
+        if (location != null) {
+            removeLoginLocation(key);
+        }
+        return location;
+    }
+
+    public void clearLoginLocation(String name) {
+        String key = name.toLowerCase();
+        loginLocations.remove(key);
+        removeLoginLocation(key);
+    }
+
+    public void markLoginTeleport(String name) {
+        loginTeleports.add(name.toLowerCase());
+    }
+
+    public boolean consumeLoginTeleport(String name) {
+        return loginTeleports.remove(name.toLowerCase());
+    }
+
+    public void clearLoginTeleport(String name) {
+        loginTeleports.remove(name.toLowerCase());
+    }
+
+    public Location getLoginSpawnLocation(Player player) {
+        if (!getServer().getWorlds().isEmpty()) {
+            return getServer().getWorlds().get(0).getSpawnLocation();
+        }
+        return player.getWorld().getSpawnLocation();
+    }
+
+    private void setupLoginLocationsStorage() {
+        loginLocationsFile = new File(getDataFolder(), "login-locations.yml");
+        loginLocationsConfig = YamlConfiguration.loadConfiguration(loginLocationsFile);
+        for (String key : loginLocationsConfig.getKeys(false)) {
+            Location location = readLocation(key);
+            if (location != null) {
+                loginLocations.put(key.toLowerCase(), location);
+            } else {
+                loginLocationsConfig.set(key, null);
+            }
+        }
+        saveLoginLocations();
+    }
+
+    private void persistLoginLocation(String name, Location location) {
+        if (loginLocationsConfig == null) {
+            return;
+        }
+        String base = name.toLowerCase();
+        loginLocationsConfig.set(base + ".world", location.getWorld().getName());
+        loginLocationsConfig.set(base + ".x", location.getX());
+        loginLocationsConfig.set(base + ".y", location.getY());
+        loginLocationsConfig.set(base + ".z", location.getZ());
+        loginLocationsConfig.set(base + ".yaw", location.getYaw());
+        loginLocationsConfig.set(base + ".pitch", location.getPitch());
+        saveLoginLocations();
+    }
+
+    private void removeLoginLocation(String name) {
+        if (loginLocationsConfig == null) {
+            return;
+        }
+        loginLocationsConfig.set(name.toLowerCase(), null);
+        saveLoginLocations();
+    }
+
+    private Location readLocation(String name) {
+        if (loginLocationsConfig == null) {
+            return null;
+        }
+        String base = name.toLowerCase();
+        String worldName = loginLocationsConfig.getString(base + ".world");
+        if (worldName == null) {
+            return null;
+        }
+        World world = getServer().getWorld(worldName);
+        if (world == null) {
+            return null;
+        }
+        double x = loginLocationsConfig.getDouble(base + ".x");
+        double y = loginLocationsConfig.getDouble(base + ".y");
+        double z = loginLocationsConfig.getDouble(base + ".z");
+        float yaw = (float) loginLocationsConfig.getDouble(base + ".yaw");
+        float pitch = (float) loginLocationsConfig.getDouble(base + ".pitch");
+        return new Location(world, x, y, z, yaw, pitch);
+    }
+
+    private void saveLoginLocations() {
+        try {
+            loginLocationsConfig.save(loginLocationsFile);
+        } catch (IOException e) {
+            sendMessage("§cFailed to save login locations file.");
+        }
+    }
 
     public void onEnable() {
         PluginManager pm = getServer().getPluginManager();
@@ -95,7 +215,9 @@ public class OpenLoginBukkit extends JavaPlugin {
         sendMessage(c + "/ \\_//| |_) |  __/ /\\  / /__| (_) | (_| | | | | |");
         sendMessage(c + "\\___/ | .__/ \\___\\_\\ \\/\\____/\\___/ \\__, |_|_| |_|");
         sendMessage(c + "      |_|                          |___/         ");
-        sendMessage(c + "By: www.nickuc.com / github.com/nickuc/OpeNLogin - V " + getDescription().getVersion());
+        sendMessage(c + "PLEASE JUST LOGIN - V " + getDescription().getVersion());
+        sendMessage(c + "Fork of OpenLogin with more features!");
+        sendMessage(c + "Credits: NickUC and the OpenLogin Contributors.");
         sendMessage("");
 
         Server server = getServer();
@@ -117,6 +239,9 @@ public class OpenLoginBukkit extends JavaPlugin {
             server.shutdown();
             return;
         }
+
+        // setup login locations storage
+        setupLoginLocationsStorage();
 
         // setup database
         if (!setupDatabase()) {
@@ -142,6 +267,11 @@ public class OpenLoginBukkit extends JavaPlugin {
 
         // setup listeners
         setupListeners(newUser);
+
+        // setup ProtocolLib inventory hider
+        if (pm.getPlugin("ProtocolLib") != null) {
+            new ProtocolLibInventoryHider(this).register();
+        }
 
         // start login queue task
         LoginQueue.startTask(this);
@@ -225,14 +355,14 @@ public class OpenLoginBukkit extends JavaPlugin {
             String currentVersion = "v" + getDescription().getVersion();
             updateAvailable = !currentVersion.equals(tagName);
             if (updateAvailable) {
-                sendMessage("A new version of OpeNLogin is available (" + currentVersion + " -> " + latestVersion + ").", "§e");
-            }
+            sendMessage("A new version of PLEASE JUST LOGIN is available (" + currentVersion + " -> " + latestVersion + ").", "§e");
         }
+    }
     }
 
     public boolean setupSettings() {
         File configFile = new File(getDataFolder(), "config.yml");
-        if (!configFile.exists() && !FileUtils.copyFromJar("com/nickuc/openlogin/config/config.yml", configFile)) {
+        if (!configFile.exists() && !FileUtils.copyFromJar("com/sobble/pleasejustlogin/config/config.yml", configFile)) {
             sendMessage("§cFailed to create 'config.yml' file.");
             return false;
         }
@@ -244,7 +374,7 @@ public class OpenLoginBukkit extends JavaPlugin {
 
         String lang = Settings.LANGUAGE_FILE.asString();
         File messagesFile = new File(getDataFolder() + "/lang", lang);
-        if (!messagesFile.exists() && !FileUtils.copyFromJar("com/nickuc/openlogin/config/lang/" + lang, messagesFile) && !FileUtils.copyFromJar("com/nickuc/openlogin/config/lang/messages_en.yml", messagesFile)) {
+        if (!messagesFile.exists() && !FileUtils.copyFromJar("com/sobble/pleasejustlogin/config/lang/" + lang, messagesFile) && !FileUtils.copyFromJar("com/sobble/pleasejustlogin/config/lang/messages_en.yml", messagesFile)) {
             sendMessage("§cFailed to create '" + lang + "' language file.");
             return false;
         }

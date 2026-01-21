@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.ui.title.impl;
+package com.sobble.pleasejustlogin.bukkit.ui.title.impl;
 
-import com.nickuc.openlogin.bukkit.reflection.BukkitReflection;
-import com.nickuc.openlogin.bukkit.serializer.chat.ChatComponentSerializer;
-import com.nickuc.openlogin.bukkit.ui.title.TitleAPI;
-import com.nickuc.openlogin.common.model.Title;
+import com.sobble.pleasejustlogin.bukkit.reflection.BukkitReflection;
+import com.sobble.pleasejustlogin.bukkit.serializer.chat.ChatComponentSerializer;
+import com.sobble.pleasejustlogin.bukkit.ui.title.TitleAPI;
+import com.sobble.pleasejustlogin.common.model.Title;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;

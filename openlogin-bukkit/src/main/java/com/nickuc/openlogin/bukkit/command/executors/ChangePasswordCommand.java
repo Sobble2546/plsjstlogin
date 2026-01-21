@@ -22,15 +22,15 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.command.executors;
+package com.sobble.pleasejustlogin.bukkit.command.executors;
 
-import com.nickuc.openlogin.bukkit.OpenLoginBukkit;
-import com.nickuc.openlogin.bukkit.command.BukkitAbstractCommand;
-import com.nickuc.openlogin.common.manager.AccountManagement;
-import com.nickuc.openlogin.common.model.Account;
-import com.nickuc.openlogin.common.security.hashing.BCrypt;
-import com.nickuc.openlogin.common.settings.Messages;
-import com.nickuc.openlogin.common.settings.Settings;
+import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
+import com.sobble.pleasejustlogin.bukkit.command.BukkitAbstractCommand;
+import com.sobble.pleasejustlogin.common.manager.AccountManagement;
+import com.sobble.pleasejustlogin.common.model.Account;
+import com.sobble.pleasejustlogin.common.security.hashing.BCrypt;
+import com.sobble.pleasejustlogin.common.settings.Messages;
+import com.sobble.pleasejustlogin.common.settings.Settings;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -102,7 +102,7 @@ public class ChangePasswordCommand extends BukkitAbstractCommand {
     }
 
     private void performConsole(CommandSender sender, String lb, String[] args) {
-        if (!sender.hasPermission("openlogin.admin")) {
+        if (!sender.hasPermission("plsjstlogin.admin")) {
             sender.sendMessage(Messages.INSUFFICIENT_PERMISSIONS.asString());
             return;
         }

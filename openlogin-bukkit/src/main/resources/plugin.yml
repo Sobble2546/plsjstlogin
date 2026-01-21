@@ -1,11 +1,16 @@
-name: OpeNLogin
+name: plsjstlogin
 version: ${pluginVersion}
-main: com.nickuc.openlogin.bukkit.OpenLoginBukkit
-description: 'A practical, secure and friendly authentication plugin'
+main: com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit
+description: 'Fork of OpeNLogin with more features!'
 website: 'https://www.nickuc.com'
 api-version: 1.13
-author: NickUC
+author: Sobble6466
+authors:
+  - OpenLogin Contributors
+  - NickUC
 folia-supported: true
+softdepend:
+  - ProtocolLib
 commands:
   changepassword:
     description: 'Changes your password'
@@ -16,11 +21,10 @@ commands:
     aliases:
       - 'log'
       - 'l'
-  openlogin:
-    description: 'OpenLogin management command'
-    aliases:
-      - 'ologin'
-      - 'nlogin'
+  plsjstlogin:
+    description: 'PLEASE JUST LOGIN management command'
+  plsjstadmin:
+    description: 'PLEASE JUST LOGIN admin tools'
   register:
     description: 'Register your account'
     aliases:
@@ -31,21 +35,24 @@ commands:
       - 'unreg'
 
 permissions:
-  openlogin.admin:
+  plsjstlogin.admin:
     description: 'Defines a player as admin'
     default: op
-  openlogin.command.changepassword:
+  plsjstlogin.command.changepassword:
     description: 'Allows use the command /changepassword'
     default: true
-  openlogin.command.login:
+  plsjstlogin.command.login:
     description: 'Allows use the command /login'
     default: true
-  openlogin.command.openlogin:
-    description: 'Allows use the command /openlogin'
+  plsjstlogin.command.plsjstlogin:
+    description: 'Allows use the command /plsjstlogin'
     default: true
-  openlogin.command.register:
+  plsjstlogin.command.plsjstadmin:
+    description: 'Allows use the command /plsjstadmin'
+    default: op
+  plsjstlogin.command.register:
     description: 'Allows use the command /register'
     default: true
-  openlogin.command.unregister:
+  plsjstlogin.command.unregister:
     description: 'Allows use the command /unregister'
     default: true

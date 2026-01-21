@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common.security.filter;
+package com.sobble.pleasejustlogin.common.security.filter;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;

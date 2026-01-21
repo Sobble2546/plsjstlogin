@@ -1,7 +1,7 @@
 subprojects {
     apply plugin: 'java'
 
-    group = 'com.nickuc.openlogin'
+    group = 'com.sobble.pleasejustlogin'
     version = '1.6.7'
 
     sourceCompatibility = 1.8
@@ -28,5 +28,6 @@ subprojects {
         maven { url = uri('https://hub.spigotmc.org/nexus/content/repositories/snapshots/') }
         maven { url = uri('https://repo.codemc.org/repository/maven-public') }
         maven { url = uri("https://nexuslite.gcnt.net/repos/other/")}
+        maven { url = uri('https://repo.dmulloy2.net/repository/public/') }
     }
 }

@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common.manager;
+package com.sobble.pleasejustlogin.common.manager;
 
-import com.nickuc.openlogin.common.database.Database;
-import com.nickuc.openlogin.common.model.Account;
-import com.nickuc.openlogin.common.security.hashing.BCrypt;
+import com.sobble.pleasejustlogin.common.database.Database;
+import com.sobble.pleasejustlogin.common.model.Account;
+import com.sobble.pleasejustlogin.common.security.hashing.BCrypt;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -202,6 +202,41 @@ public class AccountManagement {
 
         try {
             database.update("DELETE FROM `openlogin` WHERE `name` = ?", name.toLowerCase());
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Migrate a player's account to a new username.
+     *
+     * @param oldName the current username
+     * @param newName the new username
+     * @return true on success
+     */
+    public boolean migrate(@NonNull String oldName, @NonNull String newName) {
+        if (oldName.equalsIgnoreCase(newName)) {
+            return false;
+        }
+        boolean oldExists = search(oldName).isPresent();
+        if (!oldExists) {
+            return false;
+        }
+        boolean newExists = search(newName).isPresent();
+        if (newExists) {
+            return false;
+        }
+        try {
+            database.update(
+                    "UPDATE `openlogin` SET `name` = ?, `realname` = ? WHERE `name` = ?",
+                    newName.toLowerCase(),
+                    newName,
+                    oldName.toLowerCase()
+            );
+            invalidateCache(oldName.toLowerCase());
+            invalidateCache(newName.toLowerCase());
             return true;
         } catch (SQLException e) {
             e.printStackTrace();

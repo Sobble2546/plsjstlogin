@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common.api;
+package com.sobble.pleasejustlogin.common.api;
 
-import com.nickuc.openlogin.common.OpenLogin;
-import com.nickuc.openlogin.common.model.Account;
+import com.sobble.pleasejustlogin.common.OpenLogin;
+import com.sobble.pleasejustlogin.common.model.Account;
 import lombok.NonNull;
 
 import javax.annotation.Nullable;

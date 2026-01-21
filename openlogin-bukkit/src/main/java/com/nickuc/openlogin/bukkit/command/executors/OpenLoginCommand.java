@@ -22,15 +22,15 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.command.executors;
+package com.sobble.pleasejustlogin.bukkit.command.executors;
 
-import com.nickuc.openlogin.bukkit.OpenLoginBukkit;
-import com.nickuc.openlogin.bukkit.command.BukkitAbstractCommand;
-import com.nickuc.openlogin.bukkit.ui.chat.ActionbarAPI;
-import com.nickuc.openlogin.bukkit.ui.title.TitleAPI;
-import com.nickuc.openlogin.common.http.HttpClient;
-import com.nickuc.openlogin.common.settings.Messages;
-import com.nickuc.openlogin.common.util.FileUtils;
+import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
+import com.sobble.pleasejustlogin.bukkit.command.BukkitAbstractCommand;
+import com.sobble.pleasejustlogin.bukkit.ui.chat.ActionbarAPI;
+import com.sobble.pleasejustlogin.bukkit.ui.title.TitleAPI;
+import com.sobble.pleasejustlogin.common.http.HttpClient;
+import com.sobble.pleasejustlogin.common.settings.Messages;
+import com.sobble.pleasejustlogin.common.util.FileUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -48,7 +48,7 @@ public class OpenLoginCommand extends BukkitAbstractCommand {
             confirmAd = new AtomicBoolean();
 
     public OpenLoginCommand(OpenLoginBukkit plugin) {
-        super(plugin, "openlogin");
+        super(plugin, "plsjstlogin");
     }
 
     protected void perform(CommandSender sender, String lb, String[] args) {
@@ -176,7 +176,7 @@ public class OpenLoginCommand extends BukkitAbstractCommand {
                         sender.sendMessage(" §eIf you still have questions, please contact us:");
                         sender.sendMessage(" §bnickuc.com/discord");
                         sender.sendMessage("");
-                        sender.sendMessage(" §7To proceed with the download, type §b/openlogin nlogin §7again.");
+                        sender.sendMessage(" §7To proceed with the download, type §b/plsjstlogin nlogin §7again.");
                         sender.sendMessage("");
                     } else {
                         if (downloadLock.getAndSet(true)) {
@@ -207,8 +207,9 @@ public class OpenLoginCommand extends BukkitAbstractCommand {
         }
 
         sender.sendMessage("");
-        sender.sendMessage(" §eThis server is running §fOpenLogin v " + plugin.getDescription().getVersion() + ".");
-        sender.sendMessage(" §7Powered by §bwww.nickuc.com§7.");
+        sender.sendMessage(" §eThis server is running §fPLEASE JUST LOGIN v " + plugin.getDescription().getVersion() + ".");
+        sender.sendMessage(" §7Fork of OpenLogin with more features!");
+        sender.sendMessage(" §7Credits: NickUC and the OpenLogin Contributors.");
         sender.sendMessage("");
         sender.sendMessage(" §7GitHub: §fhttps://github.com/nickuc/OpeNLogin");
         sender.sendMessage("");

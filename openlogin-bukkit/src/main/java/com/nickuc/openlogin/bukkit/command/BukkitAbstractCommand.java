@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.command;
+package com.sobble.pleasejustlogin.bukkit.command;
 
-import com.nickuc.openlogin.bukkit.OpenLoginBukkit;
-import com.nickuc.openlogin.bukkit.command.executors.OpenLoginCommand;
-import com.nickuc.openlogin.common.manager.LoginManagement;
-import com.nickuc.openlogin.common.settings.Messages;
+import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
+import com.sobble.pleasejustlogin.bukkit.command.executors.OpenLoginCommand;
+import com.sobble.pleasejustlogin.common.manager.LoginManagement;
+import com.sobble.pleasejustlogin.common.settings.Messages;
 import lombok.NonNull;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -47,7 +47,7 @@ public abstract class BukkitAbstractCommand implements CommandExecutor {
     public BukkitAbstractCommand(OpenLoginBukkit plugin, boolean requireAuth, @NonNull String command) {
         this.plugin = plugin;
         this.requireAuth = requireAuth;
-        this.permission = "openlogin.command." + command.toLowerCase();
+        this.permission = "plsjstlogin.command." + command.toLowerCase();
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String lb, String[] args) {

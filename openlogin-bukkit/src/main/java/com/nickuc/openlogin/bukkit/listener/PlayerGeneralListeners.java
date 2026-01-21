@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.listener;
+package com.sobble.pleasejustlogin.bukkit.listener;
 
-import com.nickuc.openlogin.bukkit.OpenLoginBukkit;
-import com.nickuc.openlogin.bukkit.task.LoginQueue;
-import com.nickuc.openlogin.bukkit.ui.title.TitleAPI;
-import com.nickuc.openlogin.common.manager.LoginManagement;
+import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
+import com.sobble.pleasejustlogin.bukkit.task.LoginQueue;
+import com.sobble.pleasejustlogin.bukkit.ui.title.TitleAPI;
+import com.sobble.pleasejustlogin.common.manager.LoginManagement;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -53,7 +53,11 @@ public class PlayerGeneralListeners implements Listener {
         Player player = e.getPlayer();
         String name = player.getName();
         LoginManagement loginManagement = plugin.getLoginManagement();
+        if (loginManagement.isAuthenticated(name)) {
+            plugin.clearLoginLocation(name);
+        }
         loginManagement.cleanup(name);
+        plugin.clearLoginTeleport(name);
         LoginQueue.removeFromQueue(name);
         TitleAPI.getApi().reset(player);
     }
@@ -75,6 +79,7 @@ public class PlayerGeneralListeners implements Listener {
 
         Player player = e.getPlayer();
         String name = player.getName();
+        if (e instanceof PlayerTeleportEvent && plugin.consumeLoginTeleport(name)) return;
         if (plugin.getLoginManagement().isAuthenticated(name)) return;
         
         Location from = e.getFrom();
@@ -118,8 +123,12 @@ public class PlayerGeneralListeners implements Listener {
 
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent e) {
-        String name = e.getPlayer().getName();
-        if (!plugin.getLoginManagement().isAuthenticated(name)) e.setCancelled(true);
+        Player player = (Player) e.getPlayer();
+        String name = player.getName();
+        if (!plugin.getLoginManagement().isAuthenticated(name)) {
+            e.setCancelled(true);
+            plugin.getFoliaLib().runAtEntity(player, task -> player.closeInventory());
+        }
     }
 
     @EventHandler

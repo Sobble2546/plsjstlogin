@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.serializer.chat;
+package com.sobble.pleasejustlogin.bukkit.serializer.chat;
 
-import com.nickuc.openlogin.bukkit.reflection.BukkitReflection;
+import com.sobble.pleasejustlogin.bukkit.reflection.BukkitReflection;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

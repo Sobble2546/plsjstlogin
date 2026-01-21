@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.listener;
+package com.sobble.pleasejustlogin.bukkit.listener;
 
-import com.nickuc.openlogin.bukkit.OpenLoginBukkit;
-import com.nickuc.openlogin.common.model.Account;
-import com.nickuc.openlogin.common.settings.Messages;
+import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
+import com.sobble.pleasejustlogin.common.model.Account;
+import com.sobble.pleasejustlogin.common.settings.Messages;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

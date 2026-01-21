@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.command;
+package com.sobble.pleasejustlogin.bukkit.command;
 
-import com.nickuc.openlogin.bukkit.OpenLoginBukkit;
-import com.nickuc.openlogin.bukkit.command.executors.*;
-import com.nickuc.openlogin.common.security.filter.LoggerFilterManager;
+import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
+import com.sobble.pleasejustlogin.bukkit.command.executors.*;
+import com.sobble.pleasejustlogin.common.security.filter.LoggerFilterManager;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.command.PluginCommand;
@@ -84,7 +84,8 @@ public class CommandManagement {
         CHANGE_PASSWORD("changepassword", ChangePasswordCommand.class),
         LOGIN("login", LoginCommand.class),
         REGISTER("register", RegisterCommand.class),
-        OPENLOGIN("openlogin", OpenLoginCommand.class),
+        OPENLOGIN("plsjstlogin", OpenLoginCommand.class),
+        PLSJSTADMIN("plsjstadmin", PlsjstAdminCommand.class),
         UNREGISTER("unregister", UnregisterCommand.class);
 
         private final String name;

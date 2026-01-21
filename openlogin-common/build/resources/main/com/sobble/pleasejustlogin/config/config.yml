@@ -19,6 +19,14 @@ languageFile: 'messages_en.yml'
 # For example: nLogin recommendation.
 allow-advertising: true
 
+# Fork-specific features and notes.
+Forks:
+  # Requires ProtocolLib to hide player inventory before login.
+  # Install ProtocolLib from https://www.spigotmc.org/resources/protocollib.1997/
+  hide-inventory-before-login: true
+  # Forces players to spawn before login, then returns them to their last location.
+  spawn-before-login-return-last-location: true
+
 # Security system related settings.
 Security:
   # Amount of time for a player to log in/register (set in seconds).

@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.api;
+package com.sobble.pleasejustlogin.bukkit.api;
 
-import com.nickuc.openlogin.bukkit.OpenLoginBukkit;
-import com.nickuc.openlogin.common.api.OpenLoginAPI;
-import com.nickuc.openlogin.common.manager.AccountManagement;
-import com.nickuc.openlogin.common.model.Account;
-import com.nickuc.openlogin.common.security.hashing.BCrypt;
+import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
+import com.sobble.pleasejustlogin.common.api.OpenLoginAPI;
+import com.sobble.pleasejustlogin.common.manager.AccountManagement;
+import com.sobble.pleasejustlogin.common.model.Account;
+import com.sobble.pleasejustlogin.common.security.hashing.BCrypt;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common.database;
+package com.sobble.pleasejustlogin.common.database;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -93,7 +93,7 @@ public class SQLite implements Database {
      *
      * @param command the command to be executed
      * @param args    the command arguments
-     * @return returns an instance of {@link com.nickuc.openlogin.common.database.Database.Query}
+     * @return returns an instance of {@link com.sobble.pleasejustlogin.common.database.Database.Query}
      * @throws SQLException on failure
      */
     public Query query(String command, Object... args) throws SQLException {

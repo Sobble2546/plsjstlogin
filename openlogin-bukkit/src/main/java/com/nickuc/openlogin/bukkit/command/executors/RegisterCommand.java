@@ -22,20 +22,21 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.command.executors;
+package com.sobble.pleasejustlogin.bukkit.command.executors;
 
-import com.nickuc.openlogin.bukkit.OpenLoginBukkit;
-import com.nickuc.openlogin.bukkit.api.events.AsyncAuthenticateEvent;
-import com.nickuc.openlogin.bukkit.api.events.AsyncRegisterEvent;
-import com.nickuc.openlogin.bukkit.command.BukkitAbstractCommand;
-import com.nickuc.openlogin.bukkit.ui.title.TitleAPI;
-import com.nickuc.openlogin.common.manager.AccountManagement;
-import com.nickuc.openlogin.common.manager.LoginManagement;
-import com.nickuc.openlogin.common.security.hashing.BCrypt;
-import com.nickuc.openlogin.common.settings.Messages;
-import com.nickuc.openlogin.common.settings.Settings;
+import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
+import com.sobble.pleasejustlogin.bukkit.api.events.AsyncAuthenticateEvent;
+import com.sobble.pleasejustlogin.bukkit.api.events.AsyncRegisterEvent;
+import com.sobble.pleasejustlogin.bukkit.command.BukkitAbstractCommand;
+import com.sobble.pleasejustlogin.bukkit.ui.title.TitleAPI;
+import com.sobble.pleasejustlogin.common.manager.AccountManagement;
+import com.sobble.pleasejustlogin.common.manager.LoginManagement;
+import com.sobble.pleasejustlogin.common.security.hashing.BCrypt;
+import com.sobble.pleasejustlogin.common.settings.Messages;
+import com.sobble.pleasejustlogin.common.settings.Settings;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
 
 import java.util.Objects;
 
@@ -109,6 +110,11 @@ public class RegisterCommand extends BukkitAbstractCommand {
             plugin.getFoliaLib().runAtEntity(sender, task -> {
                 sender.setWalkSpeed(0.2F);
                 sender.setFlySpeed(0.1F);
+                Location lastLocation = plugin.popLoginLocation(name);
+                if (lastLocation != null) {
+                    sender.teleport(lastLocation);
+                }
+                sender.updateInventory();
             });
 
             new AsyncAuthenticateEvent(sender).callEvt();
@@ -116,7 +122,7 @@ public class RegisterCommand extends BukkitAbstractCommand {
     }
 
     private void performConsole(CommandSender sender, String lb, String[] args) {
-        if (!sender.hasPermission("openlogin.admin")) {
+        if (!sender.hasPermission("plsjstlogin.admin")) {
             sender.sendMessage(Messages.INSUFFICIENT_PERMISSIONS.asString());
             return;
         }
@@ -174,6 +180,11 @@ public class RegisterCommand extends BukkitAbstractCommand {
                 plugin.getFoliaLib().runAtEntity(playerIfOnline, task -> {
                     playerIfOnline.setWalkSpeed(0.2F);
                     playerIfOnline.setFlySpeed(0.1F);
+                    Location lastLocation = plugin.popLoginLocation(playerIfOnline.getName());
+                    if (lastLocation != null) {
+                        playerIfOnline.teleport(lastLocation);
+                    }
+                    playerIfOnline.updateInventory();
                 });
 
                 new AsyncAuthenticateEvent(playerIfOnline).callEvt();

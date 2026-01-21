@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common.util;
+package com.sobble.pleasejustlogin.common.util;
 
 public class ClassUtils {
 

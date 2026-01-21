@@ -9,7 +9,7 @@ dependencies {
 }
 
 shadowJar {
-    archiveFileName = 'OpenLogin.jar'
+    archiveFileName = 'plsjstlogin.jar'
 
     def libPkg = project.group + '.lib.'
     relocate 'org.bstats', libPkg + 'bstats'

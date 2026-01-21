@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.common.util;
+package com.sobble.pleasejustlogin.common.util;
 
-import com.nickuc.openlogin.common.OpenLogin;
+import com.sobble.pleasejustlogin.common.OpenLogin;
 import lombok.Cleanup;
 
 import javax.annotation.CheckReturnValue;

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.util;
+package com.sobble.pleasejustlogin.bukkit.util;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -38,7 +38,7 @@ public class TextComponentMessage {
         TextComponent nlogin = new TextComponent("nLogin");
         nlogin.setColor(ChatColor.YELLOW);
         HoverEvent nloginHover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("§6nLogin §7is a §6proprietary §7authentication plugin,\n§7updated and maintained by §bnickuc.com§7. This means that you\n§7cannot view and modify the source code of the plugin.\n\n§eIf you still have questions, please contact us:\n§bnickuc.com/discord"));
-        ClickEvent nloginClick = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/openlogin nlogin skip");
+        ClickEvent nloginClick = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/plsjstlogin nlogin skip");
         nlogin.setHoverEvent(nloginHover);
         nlogin.setClickEvent(nloginClick);
         first.addExtra(nlogin);
@@ -47,7 +47,7 @@ public class TextComponentMessage {
         TextComponent openlogin = new TextComponent("OpeNLogin");
         openlogin.setColor(ChatColor.YELLOW);
         HoverEvent openloginHover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("§bOpeNLogin §7is a §bopen source §7authentication plugin,\n§7updated and maintained by all OpeNLogin contributors.\n\n§cCurrently the plugin does not have as many resources as nLogin."));
-        ClickEvent openloginClick = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/openlogin setup");
+        ClickEvent openloginClick = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/plsjstlogin setup");
         openlogin.setHoverEvent(openloginHover);
         openlogin.setClickEvent(openloginClick);
         first.addExtra(openlogin);
@@ -78,7 +78,7 @@ public class TextComponentMessage {
         TextComponent nlogin = new TextComponent("Migrate to nLogin");
         nlogin.setColor(ChatColor.GREEN);
         HoverEvent nloginHover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("§6nLogin §7is a §6proprietary §7authentication plugin,\n§7updated and maintained by §bnickuc.com§7. This means that you\n§7cannot view and modify the source code of the plugin.\n\n§eIf you still have questions, please contact us:\n§bnickuc.com/discord"));
-        ClickEvent nloginClick = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/openlogin nlogin skip");
+        ClickEvent nloginClick = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/plsjstlogin nlogin skip");
         nlogin.setHoverEvent(nloginHover);
         nlogin.setClickEvent(nloginClick);
         first.addExtra(nlogin);
@@ -87,7 +87,7 @@ public class TextComponentMessage {
         TextComponent openlogin = new TextComponent("Keep OpeNLogin");
         openlogin.setColor(ChatColor.DARK_GRAY);
         HoverEvent openloginHover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("§7Continue using OpeNLogin."));
-        ClickEvent openloginClick = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/openlogin nlogin_ad");
+        ClickEvent openloginClick = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/plsjstlogin nlogin_ad");
         openlogin.setHoverEvent(openloginHover);
         openlogin.setClickEvent(openloginClick);
         first.addExtra(openlogin);

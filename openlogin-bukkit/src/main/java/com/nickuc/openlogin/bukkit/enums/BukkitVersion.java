@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.enums;
+package com.sobble.pleasejustlogin.bukkit.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

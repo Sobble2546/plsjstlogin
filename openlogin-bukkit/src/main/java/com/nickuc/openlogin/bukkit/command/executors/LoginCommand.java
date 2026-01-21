@@ -22,19 +22,20 @@
  * SOFTWARE.
  */
 
-package com.nickuc.openlogin.bukkit.command.executors;
+package com.sobble.pleasejustlogin.bukkit.command.executors;
 
-import com.nickuc.openlogin.bukkit.OpenLoginBukkit;
-import com.nickuc.openlogin.bukkit.api.events.AsyncAuthenticateEvent;
-import com.nickuc.openlogin.bukkit.api.events.AsyncLoginEvent;
-import com.nickuc.openlogin.bukkit.command.BukkitAbstractCommand;
-import com.nickuc.openlogin.bukkit.ui.title.TitleAPI;
-import com.nickuc.openlogin.common.manager.AccountManagement;
-import com.nickuc.openlogin.common.manager.LoginManagement;
-import com.nickuc.openlogin.common.model.Account;
-import com.nickuc.openlogin.common.settings.Messages;
+import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
+import com.sobble.pleasejustlogin.bukkit.api.events.AsyncAuthenticateEvent;
+import com.sobble.pleasejustlogin.bukkit.api.events.AsyncLoginEvent;
+import com.sobble.pleasejustlogin.bukkit.command.BukkitAbstractCommand;
+import com.sobble.pleasejustlogin.bukkit.ui.title.TitleAPI;
+import com.sobble.pleasejustlogin.common.manager.AccountManagement;
+import com.sobble.pleasejustlogin.common.manager.LoginManagement;
+import com.sobble.pleasejustlogin.common.model.Account;
+import com.sobble.pleasejustlogin.common.settings.Messages;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
 
 import java.util.Optional;
 
@@ -88,6 +89,11 @@ public class LoginCommand extends BukkitAbstractCommand {
             plugin.getFoliaLib().runAtEntity(player, task -> {
                 player.setWalkSpeed(0.2F);
                 player.setFlySpeed(0.1F);
+                Location lastLocation = plugin.popLoginLocation(name);
+                if (lastLocation != null) {
+                    player.teleport(lastLocation);
+                }
+                player.updateInventory();
             });
 
             new AsyncAuthenticateEvent(player).callEvt();
