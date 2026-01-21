@@ -11,8 +11,6 @@ allow-advertising: true
 
 # Fork-specific features and notes.
 Forks:
-  # Requires ProtocolLib to hide player inventory before login.
-  hide-inventory-before-login: true
   # Forces players to spawn before login, then returns them to their last location.
   spawn-before-login-return-last-location: true
 

@@ -99,6 +99,13 @@ public class OpenLoginBukkit extends JavaPlugin {
         persistLoginLocation(name, location);
     }
 
+    public void forceLoginLocation(Player player) {
+        String name = player.getName().toLowerCase();
+        Location location = player.getLocation().clone();
+        loginLocations.put(name, location);
+        persistLoginLocation(name, location);
+    }
+
     public Location popLoginLocation(String name) {
         String key = name.toLowerCase();
         Location location = loginLocations.remove(key);
@@ -209,13 +216,16 @@ public class OpenLoginBukkit extends JavaPlugin {
         }
 
         String c = "§9";
-        sendMessage(c + "   ___                __  __             _ ");
-        sendMessage(c + "  /___\\_ __   ___  /\\ \\ \\/ /  ___   __ _(_)_ __");
-        sendMessage(c + " //  // '_ \\ / _ \\/  \\/ / /  / _ \\ / _` | | '_ \\");
-        sendMessage(c + "/ \\_//| |_) |  __/ /\\  / /__| (_) | (_| | | | | |");
-        sendMessage(c + "\\___/ | .__/ \\___\\_\\ \\/\\____/\\___/ \\__, |_|_| |_|");
-        sendMessage(c + "      |_|                          |___/         ");
-        sendMessage(c + "PLEASE JUST LOGIN - V " + getDescription().getVersion());
+        sendMessage(c + "       _     _     _   _             _       ");
+        sendMessage(c + "      | |   (_)   | | | |           (_)      ");
+        sendMessage(c + " _ __ | |___ _ ___| |_| | ___   __ _ _ _ __  ");
+        sendMessage(c + "| '_ \\| / __| / __| __| |/ _ \\ / _` | | '_ \\ ");
+        sendMessage(c + "| |_) | \\__ \\ \\__ \\ |_| | (_) | (_| | | | | |");
+        sendMessage(c + "| .__/|_|___/ |___/\\__|_|\\___/ \\__, |_|_| |_|");
+        sendMessage(c + "| |        _/ |                 __/ |        ");
+        sendMessage(c + "|_|       |__/                 |___/         ");
+        sendMessage(" ");
+        sendMessage(c + "PLEASE JUST LOGIN! - V " + getDescription().getVersion());
         sendMessage(c + "Fork of OpenLogin with more features!");
         sendMessage(c + "Credits: NickUC and the OpenLogin Contributors.");
         sendMessage("");
@@ -335,7 +345,7 @@ public class OpenLoginBukkit extends JavaPlugin {
     public void detectUpdates() {
         String tagName = null;
         try {
-            String result = HttpClient.DEFAULT.get("https://api.github.com/repos/nickuc/OpeNLogin/releases/latest");
+            String result = HttpClient.DEFAULT.get("https://api.github.com/repos/Sobble2546/plsjstlogin/OpeNLogin/releases/latest");
 
             // avoid use Google Gson to avoid problems with older versions.
             if (result.contains("\"tag_name\":\"")) {
@@ -346,11 +356,11 @@ public class OpenLoginBukkit extends JavaPlugin {
             }
         } catch (IOException e) {
             sendMessage("§cFailed to find new updates.");
-            sendMessage("§cDownload the latest version at: https://github.com/nickuc/OpeNLogin/releases");
+            sendMessage("§cDownload the latest version at: https://github.com/Sobble2546/plsjstlogin/releases");
         }
         if (tagName == null) {
             sendMessage("§cFailed to find new updates: invalid response.");
-            sendMessage("§cDownload the latest version at: https://github.com/nickuc/OpeNLogin/releases");
+            sendMessage("§cDownload the latest version at: https://github.com/Sobble2546/plsjstlogin/releases");
         } else {
             String currentVersion = "v" + getDescription().getVersion();
             updateAvailable = !currentVersion.equals(tagName);

@@ -110,9 +110,11 @@ public class RegisterCommand extends BukkitAbstractCommand {
             plugin.getFoliaLib().runAtEntity(sender, task -> {
                 sender.setWalkSpeed(0.2F);
                 sender.setFlySpeed(0.1F);
-                Location lastLocation = plugin.popLoginLocation(name);
-                if (lastLocation != null) {
-                    sender.teleport(lastLocation);
+                if (Settings.SPAWN_BEFORE_LOGIN_RETURN_LAST_LOCATION.asBoolean()) {
+                    Location lastLocation = plugin.popLoginLocation(name);
+                    if (lastLocation != null) {
+                        sender.teleport(lastLocation);
+                    }
                 }
                 sender.updateInventory();
             });
@@ -180,9 +182,11 @@ public class RegisterCommand extends BukkitAbstractCommand {
                 plugin.getFoliaLib().runAtEntity(playerIfOnline, task -> {
                     playerIfOnline.setWalkSpeed(0.2F);
                     playerIfOnline.setFlySpeed(0.1F);
-                    Location lastLocation = plugin.popLoginLocation(playerIfOnline.getName());
-                    if (lastLocation != null) {
-                        playerIfOnline.teleport(lastLocation);
+                    if (Settings.SPAWN_BEFORE_LOGIN_RETURN_LAST_LOCATION.asBoolean()) {
+                        Location lastLocation = plugin.popLoginLocation(playerIfOnline.getName());
+                        if (lastLocation != null) {
+                            playerIfOnline.teleport(lastLocation);
+                        }
                     }
                     playerIfOnline.updateInventory();
                 });

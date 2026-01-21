@@ -32,6 +32,22 @@ import org.bukkit.entity.Player;
 
 public class TextComponentMessage {
 
+    public static void sendFirstRunAgreement(Player player) {
+        TextComponent line = new TextComponent("      ");
+
+        TextComponent agree = new TextComponent("I Agree");
+        agree.setColor(ChatColor.GREEN);
+        agree.setBold(true);
+        HoverEvent agreeHover = new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                TextComponent.fromLegacyText("§7Click to accept the first-run notice."));
+        ClickEvent agreeClick = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/plsjstlogin setup");
+        agree.setHoverEvent(agreeHover);
+        agree.setClickEvent(agreeClick);
+        line.addExtra(agree);
+
+        player.spigot().sendMessage(line);
+    }
+
     public static void sendPluginChoice(Player player) {
         TextComponent first = new TextComponent("      ");
 

@@ -62,6 +62,11 @@ public class PlsjstAdminCommand extends BukkitAbstractCommand {
                 String name = args[1];
                 AccountManagement accountManagement = plugin.getAccountManagement();
                 boolean removed = accountManagement.delete(name);
+                plugin.clearLoginLocation(name);
+                Player playerIfOnline = plugin.getServer().getPlayerExact(name);
+                if (playerIfOnline != null && Settings.SPAWN_BEFORE_LOGIN_RETURN_LAST_LOCATION.asBoolean()) {
+                    plugin.forceLoginLocation(playerIfOnline);
+                }
                 plugin.getLoginManagement().cleanup(name);
                 sender.sendMessage(removed ?
                         "§aPassword removed for §f" + name + "§a." :

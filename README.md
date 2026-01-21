@@ -1,6 +1,19 @@
-# OpeNLogin
+# Please Just Login
 
-A practical, secure and friendly authentication plugin
+Froked from [OpeNLogin](https://github.com/nickuc/OpeNLogin).  
+In goal of adding more features 
+
+## Use of genrative ai ⚠️
+Generative AI has been used in the development of **this fork** to assist with implementing and refining new features.
+
+### Features:
+* Login from Spawn and telport to last location (WITH LESS FAILURE RATES!)
+* Hide inventory when on login with [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
+* **Admin commands** to
+    * Unrigester or Remove the password of a user
+    * Migrate from old username to a new username (beta)
+    * Change player passwords securely
+
 
 ### For development:
 
@@ -36,6 +49,3 @@ dependencies {
 </dependencies>
 ```
 
-### Usage:
-![graph](https://bstats.org/signatures/bukkit/OpeNLogin.svg)
-Powered by <a href="https://bstats.org/">bStats</a>

@@ -33,6 +33,7 @@ import com.sobble.pleasejustlogin.common.manager.AccountManagement;
 import com.sobble.pleasejustlogin.common.manager.LoginManagement;
 import com.sobble.pleasejustlogin.common.model.Account;
 import com.sobble.pleasejustlogin.common.settings.Messages;
+import com.sobble.pleasejustlogin.common.settings.Settings;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
@@ -89,9 +90,11 @@ public class LoginCommand extends BukkitAbstractCommand {
             plugin.getFoliaLib().runAtEntity(player, task -> {
                 player.setWalkSpeed(0.2F);
                 player.setFlySpeed(0.1F);
-                Location lastLocation = plugin.popLoginLocation(name);
-                if (lastLocation != null) {
-                    player.teleport(lastLocation);
+                if (Settings.SPAWN_BEFORE_LOGIN_RETURN_LAST_LOCATION.asBoolean()) {
+                    Location lastLocation = plugin.popLoginLocation(name);
+                    if (lastLocation != null) {
+                        player.teleport(lastLocation);
+                    }
                 }
                 player.updateInventory();
             });

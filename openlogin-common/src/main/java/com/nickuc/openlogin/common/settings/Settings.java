@@ -52,6 +52,10 @@ public enum Settings {
     PASSWORD_LARGE(
             "Security.password.large",
             15
+    ),
+    SPAWN_BEFORE_LOGIN_RETURN_LAST_LOCATION(
+            "Forks.spawn-before-login-return-last-location",
+            true
     );
 
     static final HashMap<String, Object> SETTINGS = new HashMap<>();
@@ -83,6 +87,10 @@ public enum Settings {
 
     public int asInt() {
         return get(Integer.class);
+    }
+
+    public boolean asBoolean() {
+        return get(Boolean.class);
     }
 
     @SuppressWarnings("unchecked")

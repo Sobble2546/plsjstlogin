@@ -126,15 +126,6 @@ public class OpenLoginCommand extends BukkitAbstractCommand {
                         return;
                     }
 
-                    if (!confirmOpenLogin.getAndSet(true)) {
-                        sender.sendMessage("");
-                        sender.sendMessage(" §cnLogin is generally a better solution for most users.");
-                        sender.sendMessage(" §7If you want to install §fOpeNLogin §7anyway,");
-                        sender.sendMessage(" §7please click on the message again.");
-                        sender.sendMessage("");
-                        return;
-                    }
-
                     for (Player on : plugin.getServer().getOnlinePlayers()) {
                         plugin.getFoliaLib().runAtEntity(on, task -> on.kickPlayer("§aPlease rejoin to complete the plugin installation."));
                     }

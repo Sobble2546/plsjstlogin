@@ -27,8 +27,11 @@ package com.sobble.pleasejustlogin.bukkit.listener;
 import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
 import com.sobble.pleasejustlogin.bukkit.task.LoginQueue;
 import com.sobble.pleasejustlogin.bukkit.ui.title.TitleAPI;
+import com.sobble.pleasejustlogin.bukkit.util.TextComponentMessage;
 import com.sobble.pleasejustlogin.common.model.Title;
 import com.sobble.pleasejustlogin.common.settings.Messages;
+import com.sobble.pleasejustlogin.common.settings.Settings;
+import com.sobble.pleasejustlogin.common.util.ClassUtils;
 import lombok.AllArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -46,9 +49,11 @@ public class PlayerJoinListeners implements Listener {
         Player player = e.getPlayer();
         String name = player.getName();
 
-        plugin.rememberLoginLocation(player);
-        plugin.markLoginTeleport(name);
-        plugin.getFoliaLib().runAtEntity(player, task -> player.teleport(plugin.getLoginSpawnLocation(player)));
+        if (Settings.SPAWN_BEFORE_LOGIN_RETURN_LAST_LOCATION.asBoolean()) {
+            plugin.rememberLoginLocation(player);
+            plugin.markLoginTeleport(name);
+            plugin.getFoliaLib().runAtEntity(player, task -> player.teleport(plugin.getLoginSpawnLocation(player)));
+        }
 
         if (plugin.isNewUser()) {
             plugin.getFoliaLib().runLater(() -> {
@@ -66,8 +71,15 @@ public class PlayerJoinListeners implements Listener {
                 player.sendMessage("  §7the new features in this fork.");
                 player.sendMessage("");
 
+                if (ClassUtils.exists("net.md_5.bungee.api.chat.TextComponent")) {
+                    TextComponentMessage.sendFirstRunAgreement(player);
+                } else {
+                    player.sendMessage(" §eTo continue, type: §f'/plsjstlogin setup'");
+                }
+                player.sendMessage("");
+
                 TitleAPI.getApi().send(player,
-                        new Title("", "§ePlease log in to continue.", 0, 9999, 10));
+                        new Title("", "§ePlease accept the first-run notice.", 0, 9999, 10));
             }, 30L);
 
             e.setJoinMessage("");
