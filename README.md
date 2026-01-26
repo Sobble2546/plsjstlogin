@@ -8,11 +8,17 @@ Generative AI has been used in the development of **this fork** to assist with i
 
 ### Features:
 * Login from Spawn and telport to last location (WITH LESS FAILURE RATES!)
+![Preview](https://i.postimg.cc/sXmWc3yk/lastloc.gif)
+<small> So dont worry about your players randomly teleporting into spawn after login </small>
+
 * Hide inventory when on login with [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
-* **Admin commands** to
-    * Unrigester or Remove the password of a user
-    * Migrate from old username to a new username (beta)
-    * Change player passwords securely
+* **Admin commands** 
+```
+/plsjustadmin rmpass <Username> #Removes Passwword for that user (acts like Unregister)
+/plsjustadmin migrate <OldUsername> <NewUsername> # Migrates from old username to new username (Untested Use it at your on risk)
+/plsjustadmin changepass <Username> <New Password> #Changes Password
+```
+
 
 
 ### For development:
