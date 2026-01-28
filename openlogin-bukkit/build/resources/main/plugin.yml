@@ -1,5 +1,5 @@
 name: plsjstlogin
-version: 1.6.7
+version: 1.6.9
 main: com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit
 description: 'Fork of OpeNLogin with more features!'
 website: 'https://www.nickuc.com'
