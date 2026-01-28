@@ -17,6 +17,7 @@ Generative AI has been used in the development of **this fork** to assist with i
 /plsjustadmin rmpass <Username> #Removes Passwword for that user (acts like Unregister)
 /plsjustadmin migrate <OldUsername> <NewUsername> # Migrates from old username to new username (Untested Use it at your on risk)
 /plsjustadmin changepass <Username> <New Password> #Changes Password
+/plsjustadmin import <LoginSecurtiy> # Migrate from LoginSecurity to Plsjstlogin
 ```
 
 

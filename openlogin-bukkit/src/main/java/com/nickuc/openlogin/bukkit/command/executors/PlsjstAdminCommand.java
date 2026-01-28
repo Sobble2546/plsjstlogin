@@ -33,6 +33,12 @@ import com.sobble.pleasejustlogin.common.settings.Settings;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Optional;
 
 public class PlsjstAdminCommand extends BukkitAbstractCommand {
@@ -48,7 +54,7 @@ public class PlsjstAdminCommand extends BukkitAbstractCommand {
         }
 
         if (args.length < 2) {
-            sender.sendMessage("§cUsage: /" + lb + " <rmpass|migrate|changepass> <args>");
+            sender.sendMessage("§cUsage: /" + lb + " <rmpass|migrate|changepass|import> <args>");
             return;
         }
 
@@ -128,8 +134,103 @@ public class PlsjstAdminCommand extends BukkitAbstractCommand {
                 sender.sendMessage(Messages.PASSWORD_CHANGED.asString());
                 return;
             }
+            case "import": {
+                if (args.length != 2 || !args[1].equalsIgnoreCase("loginsecurity")) {
+                    sender.sendMessage("§cUsage: /" + lb + " import LoginSecurity");
+                    return;
+                }
+                importLoginSecurity(sender);
+                return;
+            }
             default:
-                sender.sendMessage("§cUsage: /" + lb + " <rmpass|migrate|changepass> <args>");
+                sender.sendMessage("§cUsage: /" + lb + " <rmpass|migrate|changepass|import> <args>");
         }
+    }
+
+    private void importLoginSecurity(CommandSender sender) {
+        File pluginsDir = plugin.getDataFolder().getParentFile();
+        File dbFile = resolveLoginSecurityDb(pluginsDir);
+        if (dbFile == null) {
+            sender.sendMessage("§cLoginSecurity.db not found in the plugins folder.");
+            return;
+        }
+
+        int imported = 0;
+        int skipped = 0;
+        int unsupported = 0;
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            sender.sendMessage("§cSQLite driver not found.");
+            return;
+        }
+
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dbFile.toString());
+             Statement statement = connection.createStatement();
+             ResultSet rs = statement.executeQuery(
+                     "SELECT last_name, ip_address, password, last_login, registration_date FROM ls_players")) {
+
+            while (rs.next()) {
+                String name = rs.getString("last_name");
+                if (name == null || name.trim().isEmpty()) {
+                    skipped++;
+                    continue;
+                }
+
+                String password = rs.getString("password");
+                if (password == null || !password.startsWith("$2")) {
+                    unsupported++;
+                    continue;
+                }
+
+                if (plugin.getAccountManagement().search(name).isPresent()) {
+                    skipped++;
+                    continue;
+                }
+
+                String address = rs.getString("ip_address");
+                long lastLogin = rs.getLong("last_login");
+                long regDate = rs.getLong("registration_date");
+
+                plugin.getDatabase().update(
+                        "INSERT INTO `openlogin` (`name`, `realname`, `password`, `address`, `lastlogin`, `regdate`) " +
+                                "VALUES (?, ?, ?, ?, ?, ?)",
+                        name.toLowerCase(),
+                        name,
+                        password,
+                        address == null ? "127.0.0.1" : address,
+                        lastLogin,
+                        regDate
+                );
+                imported++;
+            }
+        } catch (SQLException e) {
+            sender.sendMessage("§cFailed to import LoginSecurity database.");
+            e.printStackTrace();
+            return;
+        }
+
+        sender.sendMessage("§aLoginSecurity import complete.");
+        sender.sendMessage(" §7Imported: §f" + imported);
+        sender.sendMessage(" §7Skipped: §f" + skipped);
+        sender.sendMessage(" §7Unsupported hashes: §f" + unsupported);
+    }
+
+    private File resolveLoginSecurityDb(File pluginsDir) {
+        File rootDb = new File(pluginsDir, "LoginSecurity.db");
+        if (rootDb.exists()) {
+            return rootDb;
+        }
+        File pluginFolder = new File(pluginsDir, "LoginSecurity");
+        File nestedDb = new File(pluginFolder, "LoginSecurity.db");
+        if (nestedDb.exists()) {
+            return nestedDb;
+        }
+        File databaseDb = new File(pluginFolder, "database.db");
+        if (databaseDb.exists()) {
+            return databaseDb;
+        }
+        return null;
     }
 }

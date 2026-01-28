@@ -106,6 +106,13 @@ public class OpenLoginBukkit extends JavaPlugin {
         persistLoginLocation(name, location);
     }
 
+    public void forceLoginLocation(Player player, Location location) {
+        String name = player.getName().toLowerCase();
+        Location safeLocation = location == null ? player.getLocation().clone() : location.clone();
+        loginLocations.put(name, safeLocation);
+        persistLoginLocation(name, safeLocation);
+    }
+
     public Location popLoginLocation(String name) {
         String key = name.toLowerCase();
         Location location = loginLocations.remove(key);

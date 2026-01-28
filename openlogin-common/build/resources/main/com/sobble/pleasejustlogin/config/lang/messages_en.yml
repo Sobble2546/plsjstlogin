@@ -52,7 +52,7 @@ Messages:
 
   successful-operations:
     # Message when a user exchanges their password
-    password-changed: "&aYour password has been successfully changed."
+    password-changed: "&aYour password request has been successfull."
 
     # Message sent when a user successfully logs
     successful-login: "&aYou have successfully logged."

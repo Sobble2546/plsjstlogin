@@ -28,6 +28,7 @@ import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
 import com.sobble.pleasejustlogin.bukkit.task.LoginQueue;
 import com.sobble.pleasejustlogin.bukkit.ui.title.TitleAPI;
 import com.sobble.pleasejustlogin.common.manager.LoginManagement;
+import com.sobble.pleasejustlogin.common.settings.Settings;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -53,6 +54,13 @@ public class PlayerGeneralListeners implements Listener {
         Player player = e.getPlayer();
         String name = player.getName();
         LoginManagement loginManagement = plugin.getLoginManagement();
+        if (Settings.SPAWN_BEFORE_LOGIN_RETURN_LAST_LOCATION.asBoolean() && player.isDead()) {
+            Location respawn = player.getBedSpawnLocation();
+            if (respawn == null) {
+                respawn = player.getWorld().getSpawnLocation();
+            }
+            plugin.forceLoginLocation(player, respawn);
+        }
         if (loginManagement.isAuthenticated(name)) {
             plugin.clearLoginLocation(name);
         }
