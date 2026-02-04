@@ -166,8 +166,12 @@ public class CaptchaManager {
                 if (slot >= 0 && slot <= 8) {
                     player.getInventory().setItem(slot, session.getReplacedItem());
                 } else {
-                    // If slot is invalid, add to inventory
-                    player.getInventory().addItem(session.getReplacedItem());
+                    // If slot is invalid, add to inventory and drop leftovers
+                    Map<Integer, ItemStack> leftovers = player.getInventory().addItem(session.getReplacedItem());
+                    // Drop any items that couldn't fit
+                    for (ItemStack leftover : leftovers.values()) {
+                        player.getWorld().dropItemNaturally(player.getLocation(), leftover);
+                    }
                 }
                 player.updateInventory();
             }
@@ -201,19 +205,26 @@ public class CaptchaManager {
                 // Try to remove map from player if online and restore replaced item
                 Player player = Bukkit.getPlayerExact(entry.getKey());
                 if (player != null && player.isOnline()) {
-                    removeCaptchaMap(player);
-                    
-                    // Restore the replaced item if there was one
-                    if (session.getReplacedItem() != null) {
-                        int slot = Settings.CAPTCHA_MAP_SLOT.asInt();
-                        if (slot >= 0 && slot <= 8) {
-                            player.getInventory().setItem(slot, session.getReplacedItem());
-                        } else {
-                            // If slot is invalid, add to inventory
-                            player.getInventory().addItem(session.getReplacedItem());
+                    // Run all player operations on the entity thread
+                    plugin.getFoliaLib().runAtEntity(player, task -> {
+                        removeCaptchaMap(player);
+                        
+                        // Restore the replaced item if there was one
+                        if (session.getReplacedItem() != null) {
+                            int slot = Settings.CAPTCHA_MAP_SLOT.asInt();
+                            if (slot >= 0 && slot <= 8) {
+                                player.getInventory().setItem(slot, session.getReplacedItem());
+                            } else {
+                                // If slot is invalid, add to inventory and drop leftovers
+                                Map<Integer, ItemStack> leftovers = player.getInventory().addItem(session.getReplacedItem());
+                                // Drop any items that couldn't fit
+                                for (ItemStack leftover : leftovers.values()) {
+                                    player.getWorld().dropItemNaturally(player.getLocation(), leftover);
+                                }
+                            }
+                            player.updateInventory();
                         }
-                        player.updateInventory();
-                    }
+                    });
                 }
             }
         }
@@ -312,8 +323,12 @@ public class CaptchaManager {
             // Switch player's held item to the CAPTCHA map slot so they can see it
             plugin.getFoliaLib().runAtEntity(player, task -> player.getInventory().setHeldItemSlot(slot));
         } else {
-            // Add to first empty slot
-            inv.addItem(mapItem);
+            // Add to first empty slot and drop leftovers
+            Map<Integer, ItemStack> leftovers = inv.addItem(mapItem);
+            // Drop any items that couldn't fit (shouldn't happen with a single map, but handle it)
+            for (ItemStack leftover : leftovers.values()) {
+                player.getWorld().dropItemNaturally(player.getLocation(), leftover);
+            }
         }
 
         player.updateInventory();
