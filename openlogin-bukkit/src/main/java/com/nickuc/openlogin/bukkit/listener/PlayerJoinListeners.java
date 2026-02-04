@@ -92,11 +92,44 @@ public class PlayerJoinListeners implements Listener {
         player.setWalkSpeed(0F);
         player.setFlySpeed(0F);
 
+        // Check if CAPTCHA is enabled
+        boolean captchaEnabled = Settings.CAPTCHA_ENABLED.asBoolean();
+        boolean captchaOnLogin = captchaEnabled && Settings.CAPTCHA_USE_ON_LOGIN.asBoolean();
+        boolean captchaOnRegister = captchaEnabled && Settings.CAPTCHA_USE_ON_REGISTER.asBoolean();
+
         if (registered) {
-            player.sendMessage(Messages.MESSAGE_LOGIN.asString());
+            if (captchaOnLogin) {
+                // Generate CAPTCHA immediately for login
+                String captchaCode = plugin.getCaptchaManager().generateAndGiveCaptcha(player);
+                if (captchaCode != null) {
+                    player.sendMessage(Messages.CAPTCHA_MAP_GIVEN.asString());
+                    player.sendMessage(Messages.CAPTCHA_INSTRUCTION.asString());
+                    player.sendMessage(Messages.MESSAGE_LOGIN_CAPTCHA.asString());
+                } else {
+                    // CAPTCHA generation failed, log and fall back to normal login
+                    plugin.getLogger().warning("Failed to generate CAPTCHA for player " + name + " (login). Falling back to normal login.");
+                    player.sendMessage(Messages.MESSAGE_LOGIN.asString());
+                }
+            } else {
+                player.sendMessage(Messages.MESSAGE_LOGIN.asString());
+            }
             TitleAPI.getApi().send(player, Messages.TITLE_BEFORE_LOGIN.asTitle());
         } else {
-            player.sendMessage(Messages.MESSAGE_REGISTER.asString());
+            if (captchaOnRegister) {
+                // Generate CAPTCHA immediately for registration
+                String captchaCode = plugin.getCaptchaManager().generateAndGiveCaptcha(player);
+                if (captchaCode != null) {
+                    player.sendMessage(Messages.CAPTCHA_MAP_GIVEN.asString());
+                    player.sendMessage(Messages.CAPTCHA_INSTRUCTION.asString());
+                    player.sendMessage(Messages.MESSAGE_REGISTER_CAPTCHA.asString());
+                } else {
+                    // CAPTCHA generation failed, log and fall back to normal registration
+                    plugin.getLogger().warning("Failed to generate CAPTCHA for player " + name + " (register). Falling back to normal registration.");
+                    player.sendMessage(Messages.MESSAGE_REGISTER.asString());
+                }
+            } else {
+                player.sendMessage(Messages.MESSAGE_REGISTER.asString());
+            }
             TitleAPI.getApi().send(player, Messages.TITLE_BEFORE_REGISTER.asTitle());
         }
     }

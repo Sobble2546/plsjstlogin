@@ -25,6 +25,7 @@
 package com.sobble.pleasejustlogin.bukkit;
 
 import com.sobble.pleasejustlogin.bukkit.api.OLBukkitAPI;
+import com.sobble.pleasejustlogin.bukkit.captcha.CaptchaManager;
 import com.sobble.pleasejustlogin.bukkit.command.CommandManagement;
 import com.sobble.pleasejustlogin.bukkit.listener.PlayerAuthenticateListener;
 import com.sobble.pleasejustlogin.bukkit.listener.PlayerGeneralListeners;
@@ -74,6 +75,7 @@ public class OpenLoginBukkit extends JavaPlugin {
     private LoginManagement loginManagement;
     private AccountManagement accountManagement;
     private CommandManagement commandManagement;
+    private CaptchaManager captchaManager;
     private ServerImplementation foliaLib;
 
     private Database database;
@@ -275,6 +277,9 @@ public class OpenLoginBukkit extends JavaPlugin {
         // setup login management
         loginManagement = new LoginManagement(accountManagement);
 
+        // setup captcha manager
+        captchaManager = new CaptchaManager(this);
+
         // setup commands
         commandManagement = new CommandManagement(this);
         commandManagement.register();
@@ -292,6 +297,9 @@ public class OpenLoginBukkit extends JavaPlugin {
 
         // start login queue task
         LoginQueue.startTask(this);
+
+        // start captcha cleanup task (runs every 60 seconds)
+        foliaLib.runTimerAsync(task -> captchaManager.cleanupExpired(), 20L * 60L, 20L * 60L);
 
         // setup api
         OpenLogin.setApi(new OLBukkitAPI(this));

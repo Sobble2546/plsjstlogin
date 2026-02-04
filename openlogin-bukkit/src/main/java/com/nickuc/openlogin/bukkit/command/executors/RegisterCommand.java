@@ -27,6 +27,7 @@ package com.sobble.pleasejustlogin.bukkit.command.executors;
 import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
 import com.sobble.pleasejustlogin.bukkit.api.events.AsyncAuthenticateEvent;
 import com.sobble.pleasejustlogin.bukkit.api.events.AsyncRegisterEvent;
+import com.sobble.pleasejustlogin.bukkit.captcha.CaptchaManager;
 import com.sobble.pleasejustlogin.bukkit.command.BukkitAbstractCommand;
 import com.sobble.pleasejustlogin.bukkit.ui.title.TitleAPI;
 import com.sobble.pleasejustlogin.common.manager.AccountManagement;
@@ -62,12 +63,48 @@ public class RegisterCommand extends BukkitAbstractCommand {
             return;
         }
 
-        if (args.length != 2) {
-            sender.sendMessage(Messages.MESSAGE_REGISTER.asString());
-            return;
+        // Check if CAPTCHA is enabled for registration
+        boolean captchaEnabled = Settings.CAPTCHA_ENABLED.asBoolean()
+                               && Settings.CAPTCHA_USE_ON_REGISTER.asBoolean();
+        
+        CaptchaManager captchaManager = plugin.getCaptchaManager();
+        
+        if (captchaEnabled) {
+            // Expect 3 arguments: <password> <password> <captcha>
+            if (args.length != 3) {
+                sender.sendMessage(Messages.MESSAGE_REGISTER_CAPTCHA.asString());
+                return;
+            }
+            
+            String password = args[0];
+            String passwordConfirm = args[1];
+            String captchaInput = args[2];
+            
+            // Validate CAPTCHA first
+            if (!captchaManager.validateCaptcha(name, captchaInput)) {
+                captchaManager.removeCaptcha(name);
+                plugin.getFoliaLib().runAtEntity(sender, task ->
+                    sender.kickPlayer(Messages.CAPTCHA_INCORRECT.asString())
+                );
+                return;
+            }
+            
+            // CAPTCHA valid, proceed with registration (will remove CAPTCHA on success)
+            performRegistration(sender, name, password, passwordConfirm, true);
+        } else {
+            // No CAPTCHA required, expect 2 arguments
+            if (args.length != 2) {
+                sender.sendMessage(Messages.MESSAGE_REGISTER.asString());
+                return;
+            }
+            
+            String password = args[0];
+            String passwordConfirm = args[1];
+            performRegistration(sender, name, password, passwordConfirm, false);
         }
+    }
 
-        String password = args[0];
+    private void performRegistration(Player sender, String name, String password, String passwordConfirm, boolean hasCaptcha) {
         int passwordLength = password.length();
 
         if (passwordLength <= Settings.PASSWORD_SMALL.asInt()) {
@@ -80,7 +117,7 @@ public class RegisterCommand extends BukkitAbstractCommand {
             return;
         }
 
-        if (!password.equals(args[1])) {
+        if (!password.equals(passwordConfirm)) {
             sender.sendMessage(Messages.PASSWORDS_DONT_MATCH.asString());
             return;
         }
@@ -103,6 +140,11 @@ public class RegisterCommand extends BukkitAbstractCommand {
         AsyncRegisterEvent registerEvent = new AsyncRegisterEvent(sender);
         if (registerEvent.callEvt()) {
             plugin.getLoginManagement().setAuthenticated(name);
+            
+            // Remove CAPTCHA only after successful registration
+            if (hasCaptcha) {
+                plugin.getCaptchaManager().removeCaptcha(name);
+            }
 
             TitleAPI.getApi().send(sender, Messages.TITLE_AFTER_REGISTER.asTitle());
             sender.sendMessage(Messages.SUCCESSFUL_REGISTER.asString());

@@ -45,6 +45,30 @@ public enum Settings {
             "Security.time-to-login",
             45
     ),
+    CAPTCHA_ENABLED(
+            "Security.captcha.enabled",
+            false
+    ),
+    CAPTCHA_USE_ON_LOGIN(
+            "Security.captcha.use-on-login",
+            false
+    ),
+    CAPTCHA_USE_ON_REGISTER(
+            "Security.captcha.use-on-register",
+            false
+    ),
+    CAPTCHA_CODE_LENGTH(
+            "Security.captcha.code-length",
+            6
+    ),
+    CAPTCHA_EXPIRATION_TIME(
+            "Security.captcha.expiration-time",
+            120
+    ),
+    CAPTCHA_MAP_SLOT(
+            "Security.captcha.map-slot",
+            0
+    ),
     PASSWORD_SMALL(
             "Security.password.small",
             5

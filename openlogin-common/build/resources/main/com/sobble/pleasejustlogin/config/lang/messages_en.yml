@@ -125,3 +125,25 @@ Messages:
 
     # Message sent to use the /unregister command
     message-unregister: "&eUse the command /unregister <current password>"
+
+  captcha-messages:
+    # Message instructing player to enter CAPTCHA from map
+    captcha-instruction: "&7Look at the map in your hand and enter the CAPTCHA code."
+    
+    # Message when CAPTCHA is incorrect
+    captcha-incorrect: "&cIncorrect CAPTCHA code. Please try again."
+    
+    # Message when CAPTCHA has expired
+    captcha-expired: "&cCAPTCHA code has expired. Please request a new one."
+    
+    # Message when CAPTCHA is required
+    captcha-required: "&cYou must complete the CAPTCHA verification first."
+    
+    # Usage message for login with CAPTCHA
+    message-login-captcha: "&eUse the command /login <password> <captcha>"
+    
+    # Usage message for register with CAPTCHA
+    message-register-captcha: "&eUse the command /register <password> <password> <captcha>"
+    
+    # Message when map is given
+    captcha-map-given: "&aA CAPTCHA map has been placed in your inventory. Check the code and use it in your command."

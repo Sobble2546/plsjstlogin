@@ -1,0 +1,6 @@
+.idea/
+.gradle/
+openlogin-universal/build/
+openlogin-common/build/
+openlogin-bukkit/build/
+plans/

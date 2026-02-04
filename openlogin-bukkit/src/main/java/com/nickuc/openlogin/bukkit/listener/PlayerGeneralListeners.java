@@ -66,6 +66,7 @@ public class PlayerGeneralListeners implements Listener {
         }
         loginManagement.cleanup(name);
         plugin.clearLoginTeleport(name);
+        plugin.getCaptchaManager().removeCaptcha(name);
         LoginQueue.removeFromQueue(name);
         TitleAPI.getApi().reset(player);
     }
@@ -92,11 +93,35 @@ public class PlayerGeneralListeners implements Listener {
         
         Location from = e.getFrom();
         Location to = e.getTo();
-        if (to != null && from.getY() > to.getY()) return;
-
+        if (to == null) return;
+        
+        // Allow looking around (pitch/yaw changes) but prevent position changes
+        if (from.getX() == to.getX() && from.getY() == to.getY() && from.getZ() == to.getZ()) {
+            // Only rotation changed, allow it
+            return;
+        }
+        
+        // Always construct a corrected location to prevent horizontal drift during falling
+        Location newLoc = from.clone();
+        
+        // Preserve rotation
+        newLoc.setYaw(to.getYaw());
+        newLoc.setPitch(to.getPitch());
+        
+        // Clamp X and Z to prevent horizontal movement
+        newLoc.setX(from.getX());
+        newLoc.setZ(from.getZ());
+        
+        // Allow falling (downward Y movement only)
+        if (to.getY() < from.getY()) {
+            newLoc.setY(to.getY());
+        } else {
+            // Prevent upward movement
+            newLoc.setY(from.getY());
+        }
+        
         // Fix "too many packets" disconnect by using PlayerMoveEvent#setTo instead of Player#teleport
-        e.setTo(from);
-        e.setCancelled(true);
+        e.setTo(newLoc);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -219,7 +244,22 @@ public class PlayerGeneralListeners implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerItemHeld(PlayerItemHeldEvent e) {
         String name = e.getPlayer().getName();
-        if (!plugin.getLoginManagement().isAuthenticated(name)) e.setCancelled(true);
+        if (!plugin.getLoginManagement().isAuthenticated(name)) {
+            // Allow switching to CAPTCHA map slot if CAPTCHA is enabled
+            boolean captchaEnabled = Settings.CAPTCHA_ENABLED.asBoolean();
+            if (captchaEnabled && plugin.getCaptchaManager().hasCaptcha(name)) {
+                int captchaSlot = Settings.CAPTCHA_MAP_SLOT.asInt();
+                // If slot is invalid, allow all switching since map is in arbitrary slot
+                if (captchaSlot < 0 || captchaSlot > 8) {
+                    return;
+                }
+                // Allow switching to the CAPTCHA slot or from it
+                if (e.getNewSlot() == captchaSlot || e.getPreviousSlot() == captchaSlot) {
+                    return; // Don't cancel, allow the switch
+                }
+            }
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
