@@ -68,8 +68,17 @@ public class CaptchaManager {
             removeCaptcha(playerName);
         }
 
-        // Generate CAPTCHA code
+        // Validate and generate CAPTCHA code
         int codeLength = Settings.CAPTCHA_CODE_LENGTH.asInt();
+        // Validate code length (must be positive, clamp to reasonable range)
+        if (codeLength <= 0) {
+            plugin.getLogger().warning("Invalid CAPTCHA code length (" + codeLength + ") for player " + player.getName() + ". Using default length of 6.");
+            codeLength = 6;
+        } else if (codeLength > 20) {
+            plugin.getLogger().warning("CAPTCHA code length too large (" + codeLength + ") for player " + player.getName() + ". Clamping to 20.");
+            codeLength = 20;
+        }
+        
         String code = CaptchaGenerator.generate(codeLength);
 
         // Create map view
@@ -163,44 +172,47 @@ public class CaptchaManager {
         // Remove map from player's inventory if they're online
         Player player = Bukkit.getPlayerExact(playerName);
         if (player != null && player.isOnline()) {
-            removeCaptchaMap(player);
-            
-            // Restore the replaced item if there was one
-            if (session != null && session.getReplacedItem() != null) {
-                int slot = Settings.CAPTCHA_MAP_SLOT.asInt();
-                PlayerInventory inv = player.getInventory();
+            // Run all inventory operations on the entity thread for Folia compatibility
+            plugin.getFoliaLib().runAtEntity(player, task -> {
+                removeCaptchaMap(player);
                 
-                if (slot >= 0 && slot <= 8) {
-                    // Check if the slot is safe to restore to
-                    ItemStack currentItem = inv.getItem(slot);
-                    boolean slotIsSafe = currentItem == null ||
-                                        currentItem.getType() == Material.AIR ||
-                                        (currentItem.getType() == Material.FILLED_MAP &&
-                                         currentItem.hasItemMeta() &&
-                                         currentItem.getItemMeta().hasDisplayName() &&
-                                         currentItem.getItemMeta().getDisplayName().contains("CAPTCHA"));
+                // Restore the replaced item if there was one
+                if (session != null && session.getReplacedItem() != null) {
+                    int slot = Settings.CAPTCHA_MAP_SLOT.asInt();
+                    PlayerInventory inv = player.getInventory();
                     
-                    if (slotIsSafe) {
-                        // Safe to restore to the original slot
-                        inv.setItem(slot, session.getReplacedItem());
+                    if (slot >= 0 && slot <= 8) {
+                        // Check if the slot is safe to restore to
+                        ItemStack currentItem = inv.getItem(slot);
+                        boolean slotIsSafe = currentItem == null ||
+                                            currentItem.getType() == Material.AIR ||
+                                            (currentItem.getType() == Material.FILLED_MAP &&
+                                             currentItem.hasItemMeta() &&
+                                             currentItem.getItemMeta().hasDisplayName() &&
+                                             currentItem.getItemMeta().getDisplayName().contains("CAPTCHA"));
+                        
+                        if (slotIsSafe) {
+                            // Safe to restore to the original slot
+                            inv.setItem(slot, session.getReplacedItem());
+                        } else {
+                            // Slot has a different item now, add to inventory instead
+                            Map<Integer, ItemStack> leftovers = inv.addItem(session.getReplacedItem());
+                            // Drop any items that couldn't fit
+                            for (ItemStack leftover : leftovers.values()) {
+                                player.getWorld().dropItemNaturally(player.getLocation(), leftover);
+                            }
+                        }
                     } else {
-                        // Slot has a different item now, add to inventory instead
+                        // If slot is invalid, add to inventory and drop leftovers
                         Map<Integer, ItemStack> leftovers = inv.addItem(session.getReplacedItem());
                         // Drop any items that couldn't fit
                         for (ItemStack leftover : leftovers.values()) {
                             player.getWorld().dropItemNaturally(player.getLocation(), leftover);
                         }
                     }
-                } else {
-                    // If slot is invalid, add to inventory and drop leftovers
-                    Map<Integer, ItemStack> leftovers = inv.addItem(session.getReplacedItem());
-                    // Drop any items that couldn't fit
-                    for (ItemStack leftover : leftovers.values()) {
-                        player.getWorld().dropItemNaturally(player.getLocation(), leftover);
-                    }
+                    player.updateInventory();
                 }
-                player.updateInventory();
-            }
+            });
         }
     }
 
