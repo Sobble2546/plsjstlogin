@@ -86,13 +86,13 @@ public class CaptchaManager {
         // Create map item
         ItemStack mapItem = createMapItem(mapView);
 
-        // Give map to player
-        giveMapToPlayer(player, mapItem);
+        // Give map to player and get the replaced item
+        ItemStack replacedItem = giveMapToPlayer(player, mapItem);
 
-        // Store session
+        // Store session with replaced item
         long expirationTime = System.currentTimeMillis() +
                 (Settings.CAPTCHA_EXPIRATION_TIME.asInt() * 1000L);
-        activeCaptchas.put(playerName, new CaptchaSession(code, expirationTime, getMapId(mapView)));
+        activeCaptchas.put(playerName, new CaptchaSession(code, expirationTime, getMapId(mapView), replacedItem));
 
         return code;
     }
@@ -113,7 +113,8 @@ public class CaptchaManager {
         }
 
         if (session.isExpired()) {
-            activeCaptchas.remove(key);
+            // Use removeCaptcha to properly clean up the map item
+            removeCaptcha(playerName);
             return false;
         }
 
@@ -136,7 +137,8 @@ public class CaptchaManager {
         }
 
         if (session.isExpired()) {
-            activeCaptchas.remove(key);
+            // Use removeCaptcha to properly clean up the map item
+            removeCaptcha(playerName);
             return false;
         }
 
@@ -145,17 +147,30 @@ public class CaptchaManager {
 
     /**
      * Remove CAPTCHA for a player and clean up the map item.
+     * Also restores the item that was replaced by the CAPTCHA map.
      *
      * @param playerName the player's name
      */
     public void removeCaptcha(String playerName) {
         String key = playerName.toLowerCase();
-        activeCaptchas.remove(key);
+        CaptchaSession session = activeCaptchas.remove(key);
 
         // Remove map from player's inventory if they're online
         Player player = Bukkit.getPlayerExact(playerName);
         if (player != null && player.isOnline()) {
             removeCaptchaMap(player);
+            
+            // Restore the replaced item if there was one
+            if (session != null && session.getReplacedItem() != null) {
+                int slot = Settings.CAPTCHA_MAP_SLOT.asInt();
+                if (slot >= 0 && slot <= 8) {
+                    player.getInventory().setItem(slot, session.getReplacedItem());
+                } else {
+                    // If slot is invalid, add to inventory
+                    player.getInventory().addItem(session.getReplacedItem());
+                }
+                player.updateInventory();
+            }
         }
     }
 
@@ -180,12 +195,25 @@ public class CaptchaManager {
         while (iterator.hasNext()) {
             Map.Entry<String, CaptchaSession> entry = iterator.next();
             if (entry.getValue().isExpired()) {
+                CaptchaSession session = entry.getValue();
                 iterator.remove();
 
-                // Try to remove map from player if online
+                // Try to remove map from player if online and restore replaced item
                 Player player = Bukkit.getPlayerExact(entry.getKey());
                 if (player != null && player.isOnline()) {
                     removeCaptchaMap(player);
+                    
+                    // Restore the replaced item if there was one
+                    if (session.getReplacedItem() != null) {
+                        int slot = Settings.CAPTCHA_MAP_SLOT.asInt();
+                        if (slot >= 0 && slot <= 8) {
+                            player.getInventory().setItem(slot, session.getReplacedItem());
+                        } else {
+                            // If slot is invalid, add to inventory
+                            player.getInventory().addItem(session.getReplacedItem());
+                        }
+                        player.updateInventory();
+                    }
                 }
             }
         }
@@ -261,13 +289,24 @@ public class CaptchaManager {
     }
 
     /**
-     * Give the CAPTCHA map to the player.
+     * Give the CAPTCHA map to the player and return the replaced item.
+     * @return The item that was replaced, or null if the slot was empty
      */
-    private void giveMapToPlayer(Player player, ItemStack mapItem) {
+    private ItemStack giveMapToPlayer(Player player, ItemStack mapItem) {
         PlayerInventory inv = player.getInventory();
         int slot = Settings.CAPTCHA_MAP_SLOT.asInt();
+        ItemStack replacedItem = null;
 
         if (slot >= 0 && slot <= 8) {
+            // Save the existing item before replacing it
+            replacedItem = inv.getItem(slot);
+            // Clone the item to avoid reference issues
+            if (replacedItem != null && replacedItem.getType() != Material.AIR) {
+                replacedItem = replacedItem.clone();
+            } else {
+                replacedItem = null;
+            }
+            
             // Place in specific hotbar slot
             inv.setItem(slot, mapItem);
             // Switch player's held item to the CAPTCHA map slot so they can see it
@@ -278,6 +317,7 @@ public class CaptchaManager {
         }
 
         player.updateInventory();
+        return replacedItem;
     }
 
     /**
@@ -308,11 +348,13 @@ public class CaptchaManager {
         private final String code;
         private final long expirationTime;
         private final int mapId;
+        private final ItemStack replacedItem; // Store the item that was replaced
 
-        public CaptchaSession(String code, long expirationTime, int mapId) {
+        public CaptchaSession(String code, long expirationTime, int mapId, ItemStack replacedItem) {
             this.code = code;
             this.expirationTime = expirationTime;
             this.mapId = mapId;
+            this.replacedItem = replacedItem;
         }
 
         public boolean isExpired() {

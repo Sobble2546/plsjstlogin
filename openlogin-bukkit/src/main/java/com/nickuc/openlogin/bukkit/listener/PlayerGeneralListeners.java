@@ -101,13 +101,24 @@ public class PlayerGeneralListeners implements Listener {
             return;
         }
         
-        // Allow falling
-        if (from.getY() > to.getY()) return;
-
-        // Prevent horizontal/upward movement but preserve rotation
+        // Always construct a corrected location to prevent horizontal drift during falling
         Location newLoc = from.clone();
+        
+        // Preserve rotation
         newLoc.setYaw(to.getYaw());
         newLoc.setPitch(to.getPitch());
+        
+        // Clamp X and Z to prevent horizontal movement
+        newLoc.setX(from.getX());
+        newLoc.setZ(from.getZ());
+        
+        // Allow falling (downward Y movement only)
+        if (to.getY() < from.getY()) {
+            newLoc.setY(to.getY());
+        } else {
+            // Prevent upward movement
+            newLoc.setY(from.getY());
+        }
         
         // Fix "too many packets" disconnect by using PlayerMoveEvent#setTo instead of Player#teleport
         e.setTo(newLoc);

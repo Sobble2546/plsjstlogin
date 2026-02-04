@@ -89,11 +89,8 @@ public class RegisterCommand extends BukkitAbstractCommand {
                 return;
             }
             
-            // CAPTCHA valid, remove it and proceed with registration
-            captchaManager.removeCaptcha(name);
-            
-            // Continue with normal registration flow
-            performRegistration(sender, name, password, passwordConfirm);
+            // CAPTCHA valid, proceed with registration (will remove CAPTCHA on success)
+            performRegistration(sender, name, password, passwordConfirm, true);
         } else {
             // No CAPTCHA required, expect 2 arguments
             if (args.length != 2) {
@@ -103,11 +100,11 @@ public class RegisterCommand extends BukkitAbstractCommand {
             
             String password = args[0];
             String passwordConfirm = args[1];
-            performRegistration(sender, name, password, passwordConfirm);
+            performRegistration(sender, name, password, passwordConfirm, false);
         }
     }
 
-    private void performRegistration(Player sender, String name, String password, String passwordConfirm) {
+    private void performRegistration(Player sender, String name, String password, String passwordConfirm, boolean hasCaptcha) {
         int passwordLength = password.length();
 
         if (passwordLength <= Settings.PASSWORD_SMALL.asInt()) {
@@ -143,6 +140,11 @@ public class RegisterCommand extends BukkitAbstractCommand {
         AsyncRegisterEvent registerEvent = new AsyncRegisterEvent(sender);
         if (registerEvent.callEvt()) {
             plugin.getLoginManagement().setAuthenticated(name);
+            
+            // Remove CAPTCHA only after successful registration
+            if (hasCaptcha) {
+                plugin.getCaptchaManager().removeCaptcha(name);
+            }
 
             TitleAPI.getApi().send(sender, Messages.TITLE_AFTER_REGISTER.asTitle());
             sender.sendMessage(Messages.SUCCESSFUL_REGISTER.asString());
