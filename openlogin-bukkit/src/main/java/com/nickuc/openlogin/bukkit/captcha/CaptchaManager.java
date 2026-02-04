@@ -118,6 +118,11 @@ public class CaptchaManager {
             return false;
         }
 
+        // Guard against null or empty input
+        if (inputCode == null || inputCode.isEmpty()) {
+            return false;
+        }
+
         // Case-insensitive comparison
         return session.getCode().equalsIgnoreCase(inputCode);
     }
