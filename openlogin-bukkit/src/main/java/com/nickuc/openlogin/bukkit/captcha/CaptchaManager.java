@@ -163,11 +163,32 @@ public class CaptchaManager {
             // Restore the replaced item if there was one
             if (session != null && session.getReplacedItem() != null) {
                 int slot = Settings.CAPTCHA_MAP_SLOT.asInt();
+                PlayerInventory inv = player.getInventory();
+                
                 if (slot >= 0 && slot <= 8) {
-                    player.getInventory().setItem(slot, session.getReplacedItem());
+                    // Check if the slot is safe to restore to
+                    ItemStack currentItem = inv.getItem(slot);
+                    boolean slotIsSafe = currentItem == null ||
+                                        currentItem.getType() == Material.AIR ||
+                                        (currentItem.getType() == Material.FILLED_MAP &&
+                                         currentItem.hasItemMeta() &&
+                                         currentItem.getItemMeta().hasDisplayName() &&
+                                         currentItem.getItemMeta().getDisplayName().contains("CAPTCHA"));
+                    
+                    if (slotIsSafe) {
+                        // Safe to restore to the original slot
+                        inv.setItem(slot, session.getReplacedItem());
+                    } else {
+                        // Slot has a different item now, add to inventory instead
+                        Map<Integer, ItemStack> leftovers = inv.addItem(session.getReplacedItem());
+                        // Drop any items that couldn't fit
+                        for (ItemStack leftover : leftovers.values()) {
+                            player.getWorld().dropItemNaturally(player.getLocation(), leftover);
+                        }
+                    }
                 } else {
                     // If slot is invalid, add to inventory and drop leftovers
-                    Map<Integer, ItemStack> leftovers = player.getInventory().addItem(session.getReplacedItem());
+                    Map<Integer, ItemStack> leftovers = inv.addItem(session.getReplacedItem());
                     // Drop any items that couldn't fit
                     for (ItemStack leftover : leftovers.values()) {
                         player.getWorld().dropItemNaturally(player.getLocation(), leftover);
