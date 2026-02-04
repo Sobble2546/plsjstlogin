@@ -74,6 +74,15 @@ public enum Messages {
     MESSAGE_REGISTER("other-messages.message-register"),
     MESSAGE_CHANGEPASSWORD("other-messages.message-changepassword"),
     MESSAGE_UNREGISTER("other-messages.message-unregister"),
+
+    // captcha messages
+    CAPTCHA_INSTRUCTION("captcha-messages.captcha-instruction"),
+    CAPTCHA_INCORRECT("captcha-messages.captcha-incorrect"),
+    CAPTCHA_EXPIRED("captcha-messages.captcha-expired"),
+    CAPTCHA_REQUIRED("captcha-messages.captcha-required"),
+    MESSAGE_LOGIN_CAPTCHA("captcha-messages.message-login-captcha"),
+    MESSAGE_REGISTER_CAPTCHA("captcha-messages.message-register-captcha"),
+    CAPTCHA_MAP_GIVEN("captcha-messages.captcha-map-given"),
     ;
 
     @Getter

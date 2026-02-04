@@ -27,6 +27,7 @@ package com.sobble.pleasejustlogin.bukkit.command.executors;
 import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
 import com.sobble.pleasejustlogin.bukkit.api.events.AsyncAuthenticateEvent;
 import com.sobble.pleasejustlogin.bukkit.api.events.AsyncLoginEvent;
+import com.sobble.pleasejustlogin.bukkit.captcha.CaptchaManager;
 import com.sobble.pleasejustlogin.bukkit.command.BukkitAbstractCommand;
 import com.sobble.pleasejustlogin.bukkit.ui.title.TitleAPI;
 import com.sobble.pleasejustlogin.common.manager.AccountManagement;
@@ -52,31 +53,81 @@ public class LoginCommand extends BukkitAbstractCommand {
             return;
         }
 
+        Player player = (Player) sender;
         String name = sender.getName();
         LoginManagement loginManagement = plugin.getLoginManagement();
+        
         if (loginManagement.isAuthenticated(name)) {
             sender.sendMessage(Messages.ALREADY_LOGIN.asString());
             return;
         }
 
-        if (args.length != 1) {
-            sender.sendMessage(Messages.MESSAGE_LOGIN.asString());
-            return;
+        // Check if CAPTCHA is enabled for login
+        boolean captchaEnabled = Settings.CAPTCHA_ENABLED.asBoolean()
+                               && Settings.CAPTCHA_USE_ON_LOGIN.asBoolean();
+        
+        CaptchaManager captchaManager = plugin.getCaptchaManager();
+        
+        if (captchaEnabled) {
+            // If player doesn't have CAPTCHA yet, generate one
+            if (!captchaManager.hasCaptcha(name)) {
+                captchaManager.generateAndGiveCaptcha(player);
+                player.sendMessage(Messages.CAPTCHA_MAP_GIVEN.asString());
+                player.sendMessage(Messages.CAPTCHA_INSTRUCTION.asString());
+                player.sendMessage(Messages.MESSAGE_LOGIN_CAPTCHA.asString());
+                return;
+            }
+            
+            // Player has CAPTCHA, expect 2 arguments: <password> <captcha>
+            if (args.length != 2) {
+                sender.sendMessage(Messages.MESSAGE_LOGIN_CAPTCHA.asString());
+                return;
+            }
+            
+            String password = args[0];
+            String captchaInput = args[1];
+            
+            // Validate CAPTCHA first
+            if (!captchaManager.validateCaptcha(name, captchaInput)) {
+                captchaManager.removeCaptcha(name);
+                plugin.getFoliaLib().runAtEntity(player, task ->
+                    player.kickPlayer(Messages.CAPTCHA_INCORRECT.asString())
+                );
+                return;
+            }
+            
+            // CAPTCHA valid, remove it and proceed with password validation
+            captchaManager.removeCaptcha(name);
+            
+            // Continue with normal login flow
+            performLogin(player, name, password);
+        } else {
+            // No CAPTCHA required, expect 1 argument
+            if (args.length != 1) {
+                sender.sendMessage(Messages.MESSAGE_LOGIN.asString());
+                return;
+            }
+            
+            String password = args[0];
+            performLogin(player, name, password);
         }
+    }
 
+    private void performLogin(Player player, String name, String password) {
         AccountManagement accountManagement = plugin.getAccountManagement();
         Optional<Account> accountOpt = accountManagement.retrieveOrLoad(name);
+        
         if (!accountOpt.isPresent()) {
-            sender.sendMessage(Messages.NOT_REGISTERED.asString());
+            player.sendMessage(Messages.NOT_REGISTERED.asString());
             return;
         }
 
         Account account = accountOpt.get();
-        String password = args[0];
-
-        Player player = (Player) sender;
+        
         if (!accountManagement.comparePassword(account, password)) {
-            plugin.getFoliaLib().runAtEntity(player, task -> player.kickPlayer(Messages.INCORRECT_PASSWORD.asString()));
+            plugin.getFoliaLib().runAtEntity(player, task ->
+                player.kickPlayer(Messages.INCORRECT_PASSWORD.asString())
+            );
             return;
         }
 

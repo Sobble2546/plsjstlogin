@@ -66,6 +66,7 @@ public class PlayerGeneralListeners implements Listener {
         }
         loginManagement.cleanup(name);
         plugin.clearLoginTeleport(name);
+        plugin.getCaptchaManager().removeCaptcha(name);
         LoginQueue.removeFromQueue(name);
         TitleAPI.getApi().reset(player);
     }
