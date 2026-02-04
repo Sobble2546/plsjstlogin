@@ -30,8 +30,15 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.reflect.StructureModifier;
 import com.sobble.pleasejustlogin.bukkit.OpenLoginBukkit;
+import com.sobble.pleasejustlogin.common.settings.Settings;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
 
 public class ProtocolLibInventoryHider {
 
@@ -52,8 +59,33 @@ public class ProtocolLibInventoryHider {
             public void onPacketSending(PacketEvent event) {
                 Player player = event.getPlayer();
                 if (!ProtocolLibInventoryHider.this.plugin.getLoginManagement().isAuthenticated(player.getName())) {
+                    // Check if CAPTCHA is enabled
+                    boolean captchaEnabled = Settings.CAPTCHA_ENABLED.asBoolean();
+                    if (captchaEnabled && event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+                        // Allow CAPTCHA map to be visible
+                        if (isCaptchaMap(event)) {
+                            return; // Don't cancel, allow the CAPTCHA map packet
+                        }
+                    }
                     event.setCancelled(true);
                 }
+            }
+            
+            private boolean isCaptchaMap(PacketEvent event) {
+                try {
+                    StructureModifier<ItemStack> items = event.getPacket().getItemModifier();
+                    ItemStack item = items.read(0);
+                    
+                    if (item != null && item.getType() == Material.FILLED_MAP) {
+                        ItemMeta meta = item.getItemMeta();
+                        if (meta != null && meta.hasDisplayName()) {
+                            return meta.getDisplayName().contains("CAPTCHA");
+                        }
+                    }
+                } catch (Exception e) {
+                    // Ignore errors
+                }
+                return false;
             }
         });
     }

@@ -107,7 +107,7 @@ public class CaptchaMapRenderer extends MapRenderer {
         // Draw each character with spacing
         int currentX = startX;
         for (char c : text.toCharArray()) {
-            canvas.drawText(currentX, startY, font, "§0" + c);
+            canvas.drawText(currentX, startY, font, String.valueOf(c));
             currentX += font.getWidth(String.valueOf(c)) + 2;
         }
         

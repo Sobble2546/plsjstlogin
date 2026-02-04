@@ -70,16 +70,7 @@ public class RegisterCommand extends BukkitAbstractCommand {
         CaptchaManager captchaManager = plugin.getCaptchaManager();
         
         if (captchaEnabled) {
-            // If player doesn't have CAPTCHA yet, generate one
-            if (!captchaManager.hasCaptcha(name)) {
-                captchaManager.generateAndGiveCaptcha(sender);
-                sender.sendMessage(Messages.CAPTCHA_MAP_GIVEN.asString());
-                sender.sendMessage(Messages.CAPTCHA_INSTRUCTION.asString());
-                sender.sendMessage(Messages.MESSAGE_REGISTER_CAPTCHA.asString());
-                return;
-            }
-            
-            // Player has CAPTCHA, expect 3 arguments: <password> <password> <captcha>
+            // Expect 3 arguments: <password> <password> <captcha>
             if (args.length != 3) {
                 sender.sendMessage(Messages.MESSAGE_REGISTER_CAPTCHA.asString());
                 return;

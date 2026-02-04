@@ -69,16 +69,7 @@ public class LoginCommand extends BukkitAbstractCommand {
         CaptchaManager captchaManager = plugin.getCaptchaManager();
         
         if (captchaEnabled) {
-            // If player doesn't have CAPTCHA yet, generate one
-            if (!captchaManager.hasCaptcha(name)) {
-                captchaManager.generateAndGiveCaptcha(player);
-                player.sendMessage(Messages.CAPTCHA_MAP_GIVEN.asString());
-                player.sendMessage(Messages.CAPTCHA_INSTRUCTION.asString());
-                player.sendMessage(Messages.MESSAGE_LOGIN_CAPTCHA.asString());
-                return;
-            }
-            
-            // Player has CAPTCHA, expect 2 arguments: <password> <captcha>
+            // Expect 2 arguments: <password> <captcha>
             if (args.length != 2) {
                 sender.sendMessage(Messages.MESSAGE_LOGIN_CAPTCHA.asString());
                 return;

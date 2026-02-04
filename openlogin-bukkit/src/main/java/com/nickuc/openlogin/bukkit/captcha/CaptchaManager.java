@@ -270,6 +270,8 @@ public class CaptchaManager {
         if (slot >= 0 && slot <= 8) {
             // Place in specific hotbar slot
             inv.setItem(slot, mapItem);
+            // Switch player's held item to the CAPTCHA map slot so they can see it
+            plugin.getFoliaLib().runAtEntity(player, task -> player.getInventory().setHeldItemSlot(slot));
         } else {
             // Add to first empty slot
             inv.addItem(mapItem);

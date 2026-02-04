@@ -93,11 +93,24 @@ public class PlayerGeneralListeners implements Listener {
         
         Location from = e.getFrom();
         Location to = e.getTo();
-        if (to != null && from.getY() > to.getY()) return;
+        if (to == null) return;
+        
+        // Allow looking around (pitch/yaw changes) but prevent position changes
+        if (from.getX() == to.getX() && from.getY() == to.getY() && from.getZ() == to.getZ()) {
+            // Only rotation changed, allow it
+            return;
+        }
+        
+        // Allow falling
+        if (from.getY() > to.getY()) return;
 
+        // Prevent horizontal/upward movement but preserve rotation
+        Location newLoc = from.clone();
+        newLoc.setYaw(to.getYaw());
+        newLoc.setPitch(to.getPitch());
+        
         // Fix "too many packets" disconnect by using PlayerMoveEvent#setTo instead of Player#teleport
-        e.setTo(from);
-        e.setCancelled(true);
+        e.setTo(newLoc);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -220,7 +233,18 @@ public class PlayerGeneralListeners implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerItemHeld(PlayerItemHeldEvent e) {
         String name = e.getPlayer().getName();
-        if (!plugin.getLoginManagement().isAuthenticated(name)) e.setCancelled(true);
+        if (!plugin.getLoginManagement().isAuthenticated(name)) {
+            // Allow switching to CAPTCHA map slot if CAPTCHA is enabled
+            boolean captchaEnabled = Settings.CAPTCHA_ENABLED.asBoolean();
+            if (captchaEnabled && plugin.getCaptchaManager().hasCaptcha(name)) {
+                int captchaSlot = Settings.CAPTCHA_MAP_SLOT.asInt();
+                // Allow switching to the CAPTCHA slot or from it
+                if (e.getNewSlot() == captchaSlot || e.getPreviousSlot() == captchaSlot) {
+                    return; // Don't cancel, allow the switch
+                }
+            }
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
