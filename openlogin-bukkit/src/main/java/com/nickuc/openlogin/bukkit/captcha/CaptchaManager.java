@@ -76,7 +76,7 @@ public class CaptchaManager {
         MapView mapView = createMapView(player);
         if (mapView == null) {
             plugin.sendMessage("§cFailed to create CAPTCHA map for " + player.getName());
-            return code;
+            return null; // Signal failure to caller
         }
 
         // Clear existing renderers and add CAPTCHA renderer
