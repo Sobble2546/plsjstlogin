@@ -249,6 +249,10 @@ public class PlayerGeneralListeners implements Listener {
             boolean captchaEnabled = Settings.CAPTCHA_ENABLED.asBoolean();
             if (captchaEnabled && plugin.getCaptchaManager().hasCaptcha(name)) {
                 int captchaSlot = Settings.CAPTCHA_MAP_SLOT.asInt();
+                // If slot is invalid, allow all switching since map is in arbitrary slot
+                if (captchaSlot < 0 || captchaSlot > 8) {
+                    return;
+                }
                 // Allow switching to the CAPTCHA slot or from it
                 if (e.getNewSlot() == captchaSlot || e.getPreviousSlot() == captchaSlot) {
                     return; // Don't cancel, allow the switch
