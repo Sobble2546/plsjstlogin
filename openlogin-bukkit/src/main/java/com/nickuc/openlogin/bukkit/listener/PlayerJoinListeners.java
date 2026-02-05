@@ -92,6 +92,23 @@ public class PlayerJoinListeners implements Listener {
         player.setWalkSpeed(0F);
         player.setFlySpeed(0F);
 
+        // Handle player visibility if invisible feature is enabled
+        if (Settings.INVISIBLE_WHILE_UNAUTHENTICATED.asBoolean()) {
+            // Hide the joining player from all authenticated players
+            for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
+                if (!onlinePlayer.equals(player) && plugin.getLoginManagement().isAuthenticated(onlinePlayer.getName())) {
+                    onlinePlayer.hidePlayer(player);
+                }
+            }
+            
+            // Hide all unauthenticated players from the joining player
+            for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
+                if (!onlinePlayer.equals(player) && !plugin.getLoginManagement().isAuthenticated(onlinePlayer.getName())) {
+                    player.hidePlayer(onlinePlayer);
+                }
+            }
+        }
+
         // Check if CAPTCHA is enabled
         boolean captchaEnabled = Settings.CAPTCHA_ENABLED.asBoolean();
         boolean captchaOnLogin = captchaEnabled && Settings.CAPTCHA_USE_ON_LOGIN.asBoolean();

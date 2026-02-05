@@ -159,6 +159,16 @@ public class RegisterCommand extends BukkitAbstractCommand {
                     }
                 }
                 sender.updateInventory();
+                
+                // Show player to all other players if invisible feature is enabled
+                if (Settings.INVISIBLE_WHILE_UNAUTHENTICATED.asBoolean()) {
+                    for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
+                        if (!onlinePlayer.equals(sender)) {
+                            onlinePlayer.showPlayer(sender);
+                            sender.showPlayer(onlinePlayer);
+                        }
+                    }
+                }
             });
 
             new AsyncAuthenticateEvent(sender).callEvt();
@@ -231,6 +241,16 @@ public class RegisterCommand extends BukkitAbstractCommand {
                         }
                     }
                     playerIfOnline.updateInventory();
+                    
+                    // Show player to all other players if invisible feature is enabled
+                    if (Settings.INVISIBLE_WHILE_UNAUTHENTICATED.asBoolean()) {
+                        for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
+                            if (!onlinePlayer.equals(playerIfOnline)) {
+                                onlinePlayer.showPlayer(playerIfOnline);
+                                playerIfOnline.showPlayer(onlinePlayer);
+                            }
+                        }
+                    }
                 });
 
                 new AsyncAuthenticateEvent(playerIfOnline).callEvt();
