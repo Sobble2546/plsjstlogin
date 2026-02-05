@@ -245,8 +245,11 @@ public class RegisterCommand extends BukkitAbstractCommand {
                     // Show player to all other players if invisible feature is enabled
                     if (Settings.INVISIBLE_WHILE_UNAUTHENTICATED.asBoolean()) {
                         for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
-                            if (!onlinePlayer.equals(playerIfOnline)) {
-                                onlinePlayer.showPlayer(playerIfOnline);
+                            if (onlinePlayer.equals(playerIfOnline)) {
+                                continue;
+                            }
+                            onlinePlayer.showPlayer(playerIfOnline);
+                            if (plugin.getLoginManagement().isAuthenticated(onlinePlayer.getName())) {
                                 playerIfOnline.showPlayer(onlinePlayer);
                             }
                         }
