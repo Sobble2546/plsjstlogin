@@ -163,12 +163,13 @@ public class RegisterCommand extends BukkitAbstractCommand {
                 // Show player to all other players if invisible feature is enabled
                 if (Settings.INVISIBLE_WHILE_UNAUTHENTICATED.asBoolean()) {
                     for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
-                        if (onlinePlayer.equals(sender)) {
-                            continue;
-                        }
-                        onlinePlayer.showPlayer(sender);
-                        if (plugin.getLoginManagement().isAuthenticated(onlinePlayer.getName())) {
-                            sender.showPlayer(onlinePlayer);
+                        if (!onlinePlayer.equals(sender)) {
+                            // Always show the newly registered player to others
+                            onlinePlayer.showPlayer(sender);
+                            // Only show other players to the newly registered player if they are authenticated
+                            if (plugin.getLoginManagement().isAuthenticated(onlinePlayer.getName())) {
+                                sender.showPlayer(onlinePlayer);
+                            }
                         }
                     }
                 }
@@ -248,12 +249,9 @@ public class RegisterCommand extends BukkitAbstractCommand {
                     // Show player to all other players if invisible feature is enabled
                     if (Settings.INVISIBLE_WHILE_UNAUTHENTICATED.asBoolean()) {
                         for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
-                            if (onlinePlayer.equals(playerIfOnline)) {
-                                continue;
-                            }
-                            onlinePlayer.showPlayer(playerIfOnline);
-                            if (plugin.getLoginManagement().isAuthenticated(onlinePlayer.getName())) {
-                                playerIfOnline.showPlayer(onlinePlayer);
+                            if (!onlinePlayer.equals(playerIfOnline)) {
+                                // Only show the newly registered player to others (don't reveal others to them)
+                                onlinePlayer.showPlayer(playerIfOnline);
                             }
                         }
                     }

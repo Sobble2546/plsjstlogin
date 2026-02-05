@@ -144,8 +144,11 @@ public class LoginCommand extends BukkitAbstractCommand {
                 if (Settings.INVISIBLE_WHILE_UNAUTHENTICATED.asBoolean()) {
                     for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
                         if (!onlinePlayer.equals(player)) {
-                            onlinePlayer.showPlayer(player);
-                            player.showPlayer(onlinePlayer);
+                            // Only show if the other player is authenticated
+                            if (plugin.getLoginManagement().isAuthenticated(onlinePlayer.getName())) {
+                                onlinePlayer.showPlayer(player);
+                                player.showPlayer(onlinePlayer);
+                            }
                         }
                     }
                 }
