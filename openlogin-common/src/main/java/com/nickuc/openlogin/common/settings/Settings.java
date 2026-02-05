@@ -45,6 +45,10 @@ public enum Settings {
             "Security.time-to-login",
             45
     ),
+    INVISIBLE_WHILE_UNAUTHENTICATED(
+            "Security.invisible-while-unauthenticated",
+            true
+    ),
     CAPTCHA_ENABLED(
             "Security.captcha.enabled",
             false

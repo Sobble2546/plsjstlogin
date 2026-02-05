@@ -40,6 +40,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
@@ -143,6 +144,17 @@ public class PlayerGeneralListeners implements Listener {
         if (!(e.getEntity() instanceof Player)) return;
 
         Player player = ((Player) e.getEntity());
+        if (!plugin.getLoginManagement().isAuthenticated(player.getName())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onEntityRegainHealth(EntityRegainHealthEvent e) {
+        if (e.isCancelled()) return;
+        if (!(e.getEntity() instanceof Player)) return;
+
+        Player player = (Player) e.getEntity();
         if (!plugin.getLoginManagement().isAuthenticated(player.getName())) {
             e.setCancelled(true);
         }

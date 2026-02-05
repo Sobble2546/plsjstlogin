@@ -139,6 +139,19 @@ public class LoginCommand extends BukkitAbstractCommand {
                     }
                 }
                 player.updateInventory();
+                
+                // Show player to all other players if invisible feature is enabled
+                if (Settings.INVISIBLE_WHILE_UNAUTHENTICATED.asBoolean()) {
+                    for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
+                        if (!onlinePlayer.equals(player)) {
+                            // Only show if the other player is authenticated
+                            if (plugin.getLoginManagement().isAuthenticated(onlinePlayer.getName())) {
+                                onlinePlayer.showPlayer(player);
+                                player.showPlayer(onlinePlayer);
+                            }
+                        }
+                    }
+                }
             });
 
             new AsyncAuthenticateEvent(player).callEvt();
