@@ -352,7 +352,7 @@ public class OpenLoginBukkit extends JavaPlugin {
     }
 
     private void setupMetrics() {
-        Metrics metrics = new Metrics(this, 8951);
+        Metrics metrics = new Metrics(this, 29354);
         metrics.addCustomChart(new SimplePie("language_file", Settings.LANGUAGE_FILE::asString));
         metrics.addCustomChart(new SingleLineChart("registered_users", () -> registeredUsers));
     }
