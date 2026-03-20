@@ -93,7 +93,10 @@ public class PlayerKickListeners implements Listener {
 
         // prevent kick online players
         if (reason.contains("You logged in from another location")) {
-            e.setCancelled(true);
+            String name = e.getPlayer().getName();
+            if (plugin.getLoginManagement().isAuthenticated(name)) {
+                e.setCancelled(true);
+            }
         }
     }
 

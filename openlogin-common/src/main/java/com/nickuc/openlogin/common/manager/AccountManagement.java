@@ -127,6 +127,24 @@ public class AccountManagement {
     }
 
     /**
+     * Counts accounts by IP.
+     *
+     * @param address the IP address
+     * @return the number of accounts
+     */
+    public int countByIp(@NonNull String address) {
+        try (Database.Query query = database.query("SELECT COUNT(*) FROM `openlogin` WHERE `address` = ?", address)) {
+            ResultSet resultSet = query.resultSet;
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
      * Update the player's database column.
      *
      * @param name           the name of the player (realname)

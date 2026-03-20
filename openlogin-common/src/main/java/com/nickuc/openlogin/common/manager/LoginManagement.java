@@ -36,8 +36,40 @@ public class LoginManagement {
 
     private final Map<String, Long> lock = new HashMap<>();
     private final HashSet<String> logged = new HashSet<>();
+    private final Map<String, Integer> failedAttempts = new HashMap<>();
+    private final Map<String, Long> ipLockout = new HashMap<>();
 
     private final AccountManagement accountManagement;
+
+    public boolean isIpLockedOut(String ip) {
+        synchronized (ipLockout) {
+            Long unlockTime = ipLockout.get(ip);
+            return unlockTime != null && unlockTime > System.currentTimeMillis();
+        }
+    }
+
+    public void registerFailedAttempt(String ip) {
+        synchronized (ipLockout) {
+            int attempts = failedAttempts.getOrDefault(ip, 0) + 1;
+            failedAttempts.put(ip, attempts);
+            if (attempts >= 5) {
+                // Exponential backoff: 5 failures -> 5 min, 6 -> 15 min, 7 -> 1 hr
+                long lockoutDuration = 0;
+                if (attempts == 5) lockoutDuration = 5 * 60 * 1000L;
+                else if (attempts == 6) lockoutDuration = 15 * 60 * 1000L;
+                else lockoutDuration = 60 * 60 * 1000L;
+                
+                ipLockout.put(ip, System.currentTimeMillis() + lockoutDuration);
+            }
+        }
+    }
+
+    public void clearFailedAttempts(String ip) {
+        synchronized (ipLockout) {
+            failedAttempts.remove(ip);
+            ipLockout.remove(ip);
+        }
+    }
 
     /**
      * Clears the player cache
@@ -46,9 +78,6 @@ public class LoginManagement {
      */
     public void cleanup(@NonNull String name) {
         String nameLower = name.toLowerCase();
-        synchronized (lock) {
-            lock.remove(nameLower);
-        }
         synchronized (logged) {
             logged.remove(nameLower);
         }

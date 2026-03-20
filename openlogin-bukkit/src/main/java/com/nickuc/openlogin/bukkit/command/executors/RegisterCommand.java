@@ -128,10 +128,16 @@ public class RegisterCommand extends BukkitAbstractCommand {
             sender.sendMessage(Messages.ALREADY_REGISTERED.asString());
             return;
         }
+        
+        String address = sender.getAddress() != null ? sender.getAddress().getAddress().getHostAddress() : "127.0.0.1";
+        int maxPerIp = Settings.MAX_ACCOUNTS_PER_IP.asInt();
+        if (maxPerIp > 0 && accountManagement.countByIp(address) >= maxPerIp) {
+            sender.sendMessage("§cYou have reached the maximum number of accounts per IP.");
+            return;
+        }
 
         String salt = BCrypt.gensalt();
         String hashedPassword = BCrypt.hashpw(password, salt);
-        String address = sender.getAddress().getAddress().getHostAddress();
         if (!accountManagement.update(name, hashedPassword, address, false)) {
             sender.sendMessage(Messages.DATABASE_ERROR.asString());
             return;
@@ -216,10 +222,16 @@ public class RegisterCommand extends BukkitAbstractCommand {
             return;
         }
 
+        String address = playerIfOnline != null && playerIfOnline.getAddress() != null ?
+                playerIfOnline.getAddress().getAddress().getHostAddress() : "127.0.0.1";
+        int maxPerIp = Settings.MAX_ACCOUNTS_PER_IP.asInt();
+        if (maxPerIp > 0 && accountManagement.countByIp(address) >= maxPerIp) {
+            sender.sendMessage("§cThe player has reached the maximum number of accounts per IP.");
+            return;
+        }
+
         String salt = BCrypt.gensalt();
         String hashedPassword = BCrypt.hashpw(password, salt);
-        String address = playerIfOnline != null ?
-                Objects.requireNonNull(playerIfOnline.getAddress()).getAddress().getHostAddress() : null;
         if (!accountManagement.update(playerName, hashedPassword, address, false)) {
             sender.sendMessage(Messages.DATABASE_ERROR.asString());
             return;

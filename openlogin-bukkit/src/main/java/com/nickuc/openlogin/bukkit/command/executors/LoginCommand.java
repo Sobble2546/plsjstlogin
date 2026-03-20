@@ -114,13 +114,24 @@ public class LoginCommand extends BukkitAbstractCommand {
         }
 
         Account account = accountOpt.get();
+        String address = player.getAddress() != null ? player.getAddress().getAddress().getHostAddress() : "127.0.0.1";
+        
+        if (plugin.getLoginManagement().isIpLockedOut(address)) {
+            plugin.getFoliaLib().runAtEntity(player, task ->
+                player.kickPlayer("§cYou have been locked out due to too many failed login attempts. Try again later.")
+            );
+            return;
+        }
         
         if (!accountManagement.comparePassword(account, password)) {
+            plugin.getLoginManagement().registerFailedAttempt(address);
             plugin.getFoliaLib().runAtEntity(player, task ->
                 player.kickPlayer(Messages.INCORRECT_PASSWORD.asString())
             );
             return;
         }
+
+        plugin.getLoginManagement().clearFailedAttempts(address);
 
         AsyncLoginEvent loginEvent = new AsyncLoginEvent(player);
         if (loginEvent.callEvt()) {
