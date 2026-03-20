@@ -56,6 +56,7 @@ public enum Messages {
     INVALID_NICKNAME("kick-messages.invalid-nickname"),
 
     // error messages
+    REGISTRATION_LIMIT("error-messages.registration-limit"),
     ALREADY_LOGIN("error-messages.already-login"),
     ALREADY_REGISTERED("error-messages.already-registered"),
     NOT_REGISTERED("error-messages.not-registered"),

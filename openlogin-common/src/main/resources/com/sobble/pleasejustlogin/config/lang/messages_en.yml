@@ -77,6 +77,9 @@ Messages:
     invalid-nickname: "&cSorry, but you are using an invalid nickname."
 
   error-messages:
+    # Message sent when max accounts per IP is reached
+    registration-limit: "&cYou have reached the maximum number of accounts per IP."
+
     # Message sent when you are already logged in.
     already-login: "&cYou are already logged in."
 

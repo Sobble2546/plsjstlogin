@@ -129,10 +129,12 @@ public class RegisterCommand extends BukkitAbstractCommand {
             return;
         }
         
-        String address = sender.getAddress() != null && sender.getAddress().getAddress() != null ? 
-                sender.getAddress().getAddress().getHostAddress() : null;
-        if (address != null && address.equals("127.0.0.1")) {
-            address = null; // Do not apply IP limits or save loopback as account IP
+        String address = null;
+        if (sender.getAddress() != null && sender.getAddress().getAddress() != null) {
+            java.net.InetAddress inetAddress = sender.getAddress().getAddress();
+            if (!inetAddress.isLoopbackAddress()) {
+                address = inetAddress.getHostAddress();
+            }
         }
         
         int maxPerIp = address != null ? Settings.MAX_ACCOUNTS_PER_IP.asInt() : 0;
@@ -146,7 +148,7 @@ public class RegisterCommand extends BukkitAbstractCommand {
                 return;
             }
         } catch (IllegalStateException e) {
-            sender.sendMessage("§cYou have reached the maximum number of accounts per IP.");
+            sender.sendMessage(Messages.REGISTRATION_LIMIT.asString());
             return;
         }
 
@@ -229,11 +231,14 @@ public class RegisterCommand extends BukkitAbstractCommand {
             return;
         }
 
-        String address = playerIfOnline != null && playerIfOnline.getAddress() != null ?
-                playerIfOnline.getAddress().getAddress().getHostAddress() : null;
-        if (address != null && address.equals("127.0.0.1")) {
-            address = null;
+        String address = null;
+        if (playerIfOnline != null && playerIfOnline.getAddress() != null && playerIfOnline.getAddress().getAddress() != null) {
+            java.net.InetAddress inetAddress = playerIfOnline.getAddress().getAddress();
+            if (!inetAddress.isLoopbackAddress()) {
+                address = inetAddress.getHostAddress();
+            }
         }
+
         int maxPerIp = address != null ? Settings.MAX_ACCOUNTS_PER_IP.asInt() : 0;
 
         String salt = BCrypt.gensalt();
@@ -245,7 +250,7 @@ public class RegisterCommand extends BukkitAbstractCommand {
                 return;
             }
         } catch (IllegalStateException e) {
-            sender.sendMessage("§cThe player has reached the maximum number of accounts per IP.");
+            sender.sendMessage(Messages.REGISTRATION_LIMIT.asString());
             return;
         }
 
