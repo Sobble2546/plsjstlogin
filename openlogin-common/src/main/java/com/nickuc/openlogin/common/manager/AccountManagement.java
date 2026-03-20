@@ -127,6 +127,76 @@ public class AccountManagement {
     }
 
     /**
+     * Counts accounts by IP.
+     *
+     * @param address the IP address
+     * @return the number of accounts
+     */
+    public int countByIp(@NonNull String address) throws SQLException {
+        try (Database.Query query = database.query("SELECT COUNT(*) FROM `openlogin` WHERE `address` = ?", address)) {
+            ResultSet resultSet = query.resultSet;
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Create an account atomically enforcing the IP limit.
+     *
+     * @param name the name of the player (realname)
+     * @param hashedPassword the hashed password
+     * @param address the player address
+     * @param maxPerIp the max accounts per IP (0 to disable)
+     * @return true on success
+     * @throws IllegalStateException if the IP limit is exceeded
+     */
+    public boolean createAccountIfUnderIpLimit(@NonNull String name, @NonNull String hashedPassword, @Nullable String address, int maxPerIp) {
+        if (hashedPassword.trim().isEmpty()) {
+            return false;
+        }
+
+        long current = System.currentTimeMillis();
+
+        try {
+            if (address != null && maxPerIp > 0) {
+                // This is still prone to race conditions if not done in a single query transaction,
+                // but since SQLite/MySQL are used via the Query wrapper, we can do an INSERT ... SELECT or a check first.
+                // For simplicity and matching the prompt's request for atomic or just a synchronized method / transaction:
+                synchronized (this) {
+                    if (countByIp(address) >= maxPerIp) {
+                        throw new IllegalStateException("IP limit exceeded");
+                    }
+                    database.update(
+                            "INSERT INTO `openlogin` (`name`, `realname`, `password`, `address`, `lastlogin`, `regdate`) VALUES (?, ?, ?, ?, ?, ?)",
+                            name.toLowerCase(),
+                            name,
+                            hashedPassword,
+                            address,
+                            current,
+                            current
+                    );
+                }
+            } else {
+                database.update(
+                        "INSERT INTO `openlogin` (`name`, `realname`, `password`, `address`, `lastlogin`, `regdate`) VALUES (?, ?, ?, ?, ?, ?)",
+                        name.toLowerCase(),
+                        name,
+                        hashedPassword,
+                        address,
+                        current,
+                        current
+                );
+            }
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
      * Update the player's database column.
      *
      * @param name           the name of the player (realname)

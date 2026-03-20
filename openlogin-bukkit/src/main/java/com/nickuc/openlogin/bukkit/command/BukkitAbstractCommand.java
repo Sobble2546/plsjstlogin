@@ -54,17 +54,22 @@ public abstract class BukkitAbstractCommand implements CommandExecutor {
         final String name = sender.getName();
         final LoginManagement loginManagement = plugin.getLoginManagement();
 
-        if (requireAuth && sender instanceof Player && !loginManagement.isAuthenticated(name)) {
-            return true;
-        }
-
         if (plugin.isNewUser()) {
             if (!(this instanceof OpenLoginCommand)) {
                 return true;
             }
-        } else if (!sender.hasPermission(permission)) {
-            sender.sendMessage(Messages.INSUFFICIENT_PERMISSIONS.asString());
-            return true;
+            if (!sender.hasPermission(permission)) {
+                sender.sendMessage(Messages.INSUFFICIENT_PERMISSIONS.asString());
+                return true;
+            }
+        } else {
+            if (requireAuth && sender instanceof Player && !loginManagement.isAuthenticated(name)) {
+                return true;
+            }
+            if (!sender.hasPermission(permission)) {
+                sender.sendMessage(Messages.INSUFFICIENT_PERMISSIONS.asString());
+                return true;
+            }
         }
 
         if (loginManagement.isUnlocked(name)) {

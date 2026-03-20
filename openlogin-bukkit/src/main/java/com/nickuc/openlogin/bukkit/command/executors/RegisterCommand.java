@@ -128,12 +128,27 @@ public class RegisterCommand extends BukkitAbstractCommand {
             sender.sendMessage(Messages.ALREADY_REGISTERED.asString());
             return;
         }
+        
+        String address = null;
+        if (sender.getAddress() != null && sender.getAddress().getAddress() != null) {
+            java.net.InetAddress inetAddress = sender.getAddress().getAddress();
+            if (!inetAddress.isLoopbackAddress()) {
+                address = inetAddress.getHostAddress();
+            }
+        }
+        
+        int maxPerIp = address != null ? Settings.MAX_ACCOUNTS_PER_IP.asInt() : 0;
 
         String salt = BCrypt.gensalt();
         String hashedPassword = BCrypt.hashpw(password, salt);
-        String address = sender.getAddress().getAddress().getHostAddress();
-        if (!accountManagement.update(name, hashedPassword, address, false)) {
-            sender.sendMessage(Messages.DATABASE_ERROR.asString());
+        
+        try {
+            if (!accountManagement.createAccountIfUnderIpLimit(name, hashedPassword, address, maxPerIp)) {
+                sender.sendMessage(Messages.DATABASE_ERROR.asString());
+                return;
+            }
+        } catch (IllegalStateException e) {
+            sender.sendMessage(Messages.REGISTRATION_LIMIT.asString());
             return;
         }
 
@@ -216,12 +231,26 @@ public class RegisterCommand extends BukkitAbstractCommand {
             return;
         }
 
+        String address = null;
+        if (playerIfOnline != null && playerIfOnline.getAddress() != null && playerIfOnline.getAddress().getAddress() != null) {
+            java.net.InetAddress inetAddress = playerIfOnline.getAddress().getAddress();
+            if (!inetAddress.isLoopbackAddress()) {
+                address = inetAddress.getHostAddress();
+            }
+        }
+
+        int maxPerIp = address != null ? Settings.MAX_ACCOUNTS_PER_IP.asInt() : 0;
+
         String salt = BCrypt.gensalt();
         String hashedPassword = BCrypt.hashpw(password, salt);
-        String address = playerIfOnline != null ?
-                Objects.requireNonNull(playerIfOnline.getAddress()).getAddress().getHostAddress() : null;
-        if (!accountManagement.update(playerName, hashedPassword, address, false)) {
-            sender.sendMessage(Messages.DATABASE_ERROR.asString());
+        
+        try {
+            if (!accountManagement.createAccountIfUnderIpLimit(playerName, hashedPassword, address, maxPerIp)) {
+                sender.sendMessage(Messages.DATABASE_ERROR.asString());
+                return;
+            }
+        } catch (IllegalStateException e) {
+            sender.sendMessage(Messages.REGISTRATION_LIMIT.asString());
             return;
         }
 

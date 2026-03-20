@@ -48,7 +48,7 @@ public class OpenLoginCommand extends BukkitAbstractCommand {
             confirmAd = new AtomicBoolean();
 
     public OpenLoginCommand(OpenLoginBukkit plugin) {
-        super(plugin, "plsjstlogin");
+        super(plugin, true, "plsjstlogin");
     }
 
     protected void perform(CommandSender sender, String lb, String[] args) {

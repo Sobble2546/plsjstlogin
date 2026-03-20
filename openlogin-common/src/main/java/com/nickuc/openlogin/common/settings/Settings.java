@@ -81,6 +81,10 @@ public enum Settings {
             "Security.password.large",
             15
     ),
+    MAX_ACCOUNTS_PER_IP(
+            "Security.max-accounts-per-ip",
+            3
+    ),
     SPAWN_BEFORE_LOGIN_RETURN_LAST_LOCATION(
             "Forks.spawn-before-login-return-last-location",
             true

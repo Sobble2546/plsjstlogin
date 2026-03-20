@@ -61,10 +61,14 @@ public class CommandManagement {
                     throw new RuntimeException("Missing command '" + command.name + "'");
                 }
 
-                ALLOWED_COMMANDS.add("/" + command.name);
+                if (command != Commands.PLSJSTADMIN) {
+                    ALLOWED_COMMANDS.add("/" + command.name);
+                    for (String alias : pluginCommand.getAliases()) {
+                        ALLOWED_COMMANDS.add("/" + alias.toLowerCase());
+                    }
+                }
                 LoggerFilterManager.addOpenLoginCommand("/" + command.name);
                 for (String alias : pluginCommand.getAliases()) {
-                    ALLOWED_COMMANDS.add("/" + alias.toLowerCase());
                     LoggerFilterManager.addOpenLoginCommand("/" + alias.toLowerCase());
                 }
 

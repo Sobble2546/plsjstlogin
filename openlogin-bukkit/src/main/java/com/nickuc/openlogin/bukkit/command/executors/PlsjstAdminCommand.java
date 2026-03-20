@@ -44,7 +44,7 @@ import java.util.Optional;
 public class PlsjstAdminCommand extends BukkitAbstractCommand {
 
     public PlsjstAdminCommand(OpenLoginBukkit plugin) {
-        super(plugin, "plsjstadmin");
+        super(plugin, true, "plsjstadmin");
     }
 
     protected void perform(CommandSender sender, String lb, String[] args) {

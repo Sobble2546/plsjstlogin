@@ -113,13 +113,8 @@ public class PlayerGeneralListeners implements Listener {
         newLoc.setX(from.getX());
         newLoc.setZ(from.getZ());
         
-        // Allow falling (downward Y movement only)
-        if (to.getY() < from.getY()) {
-            newLoc.setY(to.getY());
-        } else {
-            // Prevent upward movement
-            newLoc.setY(from.getY());
-        }
+        // Prevent all vertical movement to avoid void death
+        newLoc.setY(from.getY());
         
         // Fix "too many packets" disconnect by using PlayerMoveEvent#setTo instead of Player#teleport
         e.setTo(newLoc);
@@ -283,6 +278,64 @@ public class PlayerGeneralListeners implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerPickupItem(PlayerPickupItemEvent e) {
+        String name = e.getPlayer().getName();
+        if (!plugin.getLoginManagement().isAuthenticated(name)) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent e) {
+        String name = e.getPlayer().getName();
+        if (!plugin.getLoginManagement().isAuthenticated(name)) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent e) {
+        String name = e.getPlayer().getName();
+        if (!plugin.getLoginManagement().isAuthenticated(name)) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onVehicleEnter(org.bukkit.event.vehicle.VehicleEnterEvent e) {
+        if (e.getEntered() instanceof Player) {
+            String name = e.getEntered().getName();
+            if (!plugin.getLoginManagement().isAuthenticated(name)) e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onVehicleExit(org.bukkit.event.vehicle.VehicleExitEvent e) {
+        if (e.getExited() instanceof Player) {
+            String name = e.getExited().getName();
+            if (!plugin.getLoginManagement().isAuthenticated(name)) e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerPortal(PlayerPortalEvent e) {
+        String name = e.getPlayer().getName();
+        if (!plugin.getLoginManagement().isAuthenticated(name)) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerBucketFill(PlayerBucketFillEvent e) {
+        String name = e.getPlayer().getName();
+        if (!plugin.getLoginManagement().isAuthenticated(name)) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerBucketEmpty(PlayerBucketEmptyEvent e) {
+        String name = e.getPlayer().getName();
+        if (!plugin.getLoginManagement().isAuthenticated(name)) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerToggleSneak(PlayerToggleSneakEvent e) {
+        String name = e.getPlayer().getName();
+        if (!plugin.getLoginManagement().isAuthenticated(name)) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerToggleSprint(PlayerToggleSprintEvent e) {
         String name = e.getPlayer().getName();
         if (!plugin.getLoginManagement().isAuthenticated(name)) e.setCancelled(true);
     }
