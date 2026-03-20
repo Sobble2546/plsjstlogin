@@ -58,6 +58,10 @@ public abstract class BukkitAbstractCommand implements CommandExecutor {
             if (!(this instanceof OpenLoginCommand)) {
                 return true;
             }
+            if (!sender.hasPermission(permission)) {
+                sender.sendMessage(Messages.INSUFFICIENT_PERMISSIONS.asString());
+                return true;
+            }
         } else {
             if (requireAuth && sender instanceof Player && !loginManagement.isAuthenticated(name)) {
                 return true;

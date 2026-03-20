@@ -41,8 +41,24 @@ public class LoginManagement {
 
     private final AccountManagement accountManagement;
 
+    private void cleanupExpiredLockouts() {
+        long now = System.currentTimeMillis();
+        ipLockout.entrySet().removeIf(entry -> {
+            if (entry.getValue() <= now) {
+                failedAttempts.remove(entry.getKey());
+                return true;
+            }
+            return false;
+        });
+        if (ipLockout.size() > 1000) {
+            ipLockout.clear();
+            failedAttempts.clear();
+        }
+    }
+
     public boolean isIpLockedOut(String ip) {
         synchronized (ipLockout) {
+            cleanupExpiredLockouts();
             Long unlockTime = ipLockout.get(ip);
             return unlockTime != null && unlockTime > System.currentTimeMillis();
         }
@@ -50,6 +66,7 @@ public class LoginManagement {
 
     public void registerFailedAttempt(String ip) {
         synchronized (ipLockout) {
+            cleanupExpiredLockouts();
             int attempts = failedAttempts.getOrDefault(ip, 0) + 1;
             failedAttempts.put(ip, attempts);
             if (attempts >= 5) {
@@ -78,6 +95,9 @@ public class LoginManagement {
      */
     public void cleanup(@NonNull String name) {
         String nameLower = name.toLowerCase();
+        synchronized (lock) {
+            lock.remove(nameLower);
+        }
         synchronized (logged) {
             logged.remove(nameLower);
         }

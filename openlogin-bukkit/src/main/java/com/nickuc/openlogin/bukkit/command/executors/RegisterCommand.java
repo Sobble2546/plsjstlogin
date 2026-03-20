@@ -129,17 +129,24 @@ public class RegisterCommand extends BukkitAbstractCommand {
             return;
         }
         
-        String address = sender.getAddress() != null ? sender.getAddress().getAddress().getHostAddress() : "127.0.0.1";
-        int maxPerIp = Settings.MAX_ACCOUNTS_PER_IP.asInt();
-        if (maxPerIp > 0 && accountManagement.countByIp(address) >= maxPerIp) {
-            sender.sendMessage("§cYou have reached the maximum number of accounts per IP.");
-            return;
+        String address = sender.getAddress() != null && sender.getAddress().getAddress() != null ? 
+                sender.getAddress().getAddress().getHostAddress() : null;
+        if (address != null && address.equals("127.0.0.1")) {
+            address = null; // Do not apply IP limits or save loopback as account IP
         }
+        
+        int maxPerIp = address != null ? Settings.MAX_ACCOUNTS_PER_IP.asInt() : 0;
 
         String salt = BCrypt.gensalt();
         String hashedPassword = BCrypt.hashpw(password, salt);
-        if (!accountManagement.update(name, hashedPassword, address, false)) {
-            sender.sendMessage(Messages.DATABASE_ERROR.asString());
+        
+        try {
+            if (!accountManagement.createAccountIfUnderIpLimit(name, hashedPassword, address, maxPerIp)) {
+                sender.sendMessage(Messages.DATABASE_ERROR.asString());
+                return;
+            }
+        } catch (IllegalStateException e) {
+            sender.sendMessage("§cYou have reached the maximum number of accounts per IP.");
             return;
         }
 
@@ -223,17 +230,22 @@ public class RegisterCommand extends BukkitAbstractCommand {
         }
 
         String address = playerIfOnline != null && playerIfOnline.getAddress() != null ?
-                playerIfOnline.getAddress().getAddress().getHostAddress() : "127.0.0.1";
-        int maxPerIp = Settings.MAX_ACCOUNTS_PER_IP.asInt();
-        if (maxPerIp > 0 && accountManagement.countByIp(address) >= maxPerIp) {
-            sender.sendMessage("§cThe player has reached the maximum number of accounts per IP.");
-            return;
+                playerIfOnline.getAddress().getAddress().getHostAddress() : null;
+        if (address != null && address.equals("127.0.0.1")) {
+            address = null;
         }
+        int maxPerIp = address != null ? Settings.MAX_ACCOUNTS_PER_IP.asInt() : 0;
 
         String salt = BCrypt.gensalt();
         String hashedPassword = BCrypt.hashpw(password, salt);
-        if (!accountManagement.update(playerName, hashedPassword, address, false)) {
-            sender.sendMessage(Messages.DATABASE_ERROR.asString());
+        
+        try {
+            if (!accountManagement.createAccountIfUnderIpLimit(playerName, hashedPassword, address, maxPerIp)) {
+                sender.sendMessage(Messages.DATABASE_ERROR.asString());
+                return;
+            }
+        } catch (IllegalStateException e) {
+            sender.sendMessage("§cThe player has reached the maximum number of accounts per IP.");
             return;
         }
 
